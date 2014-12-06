@@ -474,7 +474,10 @@ begin
 		pv.id = the_provider_id
 		and p.provider_id = pv.id
 		and pv.active = 1
+	/* EFS poder fer comandes de productes d'stock
 		and p.orderable_type_id in (2,3,4)
+	*/
+	    and p.orderable_type_id in (1,2,3,4)
 	order by is_active desc, name asc;
 end|
 
@@ -4673,7 +4676,10 @@ begin
   where  
     pv.active = 1
     and pv.id = p.provider_id
+  /* EFS poder fer comandes de productes d'stock
     and p.orderable_type_id in (2,3,4)
+  */
+    and p.orderable_type_id in (1,2,3,4)
   order by pv.name;
 end|
 
