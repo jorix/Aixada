@@ -550,6 +550,13 @@
 					<a href="incidents.php"><img src="img/incidencias.png"/></a>
 					<p><a href="incidents.php"><?php echo $Text['icon_incidents'];?></a></p>
 				</div>
+
+				<!-- EFS-ini: añadimos la opción imprimir pedido disponible para todos -->
+				<div class="homeIcon">
+					<a href="incidents.php"><img src="img/validar.png"/></a>
+					<p><a href="local_custom/order_send.php"><?php echo $Text['icon_print'];?></a></p>
+				</div>
+				<!-- EFS-fin -->
 			</div>
 			<div id="rightSummaryCol" class="aix-style-layout-splitW80 floatLeft aix-layout-widget-center-col">
 
