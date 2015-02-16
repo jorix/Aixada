@@ -30,6 +30,7 @@ function write_fam_prod($date_for_order, $detail) {
         '1_desc_order' => null,
         '2_id_break' => null
     );
+    $total_cost = 0;
     $total_amount = 0;
     $html = '';
     while ($row = $rs->fetch_array()) {
@@ -37,8 +38,9 @@ function write_fam_prod($date_for_order, $detail) {
                     $brk['1_order_id'] != $row['order_id']) {
             // end previus order
             $html .= break2Html_end($brk, $detail);
-            $html .= orderHtml_end($total_amount, $brk['1_desc_order']);
+            $html .= orderHtml_end($total_cost, $total_amount, $brk['1_desc_order']);
             // start order
+            $total_cost = 0;
             $total_amount = 0;
             $html .= orderHtml_start($brk, $row);
         }
@@ -46,6 +48,10 @@ function write_fam_prod($date_for_order, $detail) {
             $html .= break2Html_end($brk, $detail);
             // start uf
             $brk['2_id_break'] = $row['uf_id'];
+            $sum_cost = get_sum($db, $brk, 
+                'oi.uf_id = '.$brk['2_id_break'],
+                'sum_cost'
+            );
             $sum_amount = get_sum($db, $brk, 
                 'oi.uf_id = '.$brk['2_id_break'],
                 'sum_amount'
@@ -53,33 +59,35 @@ function write_fam_prod($date_for_order, $detail) {
             $html .= '<div class="block">';
             $html .= 
                 '<h3 style="border-bottom: dotted 1px #777">'.
-                    '<div class="cel12">'.
+                    '<div class="cel10">'.
                             $row['uf_name'].'#'.$row['uf_id'].'</div>'.
-                    '<div class="cel2">&nbsp;</div>'.
                     '<div class="cel1h">&nbsp;</div>'.
-                    '<b class="cel3 num">'.number_format($sum_amount, 2).'</b>'.
+                    '<div class="cel4 num lite">Final: <b>'.number_format($sum_amount, 2).'</b></div>'.
+                    '<div class="cel3 num"><span class="lite">Cost: </span>'.number_format($sum_cost, 2).'</div>'.
                     '</h3>'.chr(10);
             if ($detail) {
                 $html .= '<div class="block-body">'.chr(10);
             }
         }
-        $amount = $row['unit_price_stamp']*$row['quantity'];
-        $total_amount += $amount;
+        $cost = $row['cost_price']*$row['quantity'];
+        $total_cost += $cost;
+        $total_amount += $row['unit_price_stamp']*$row['quantity'];
         if ($detail) {
             $html .= '<div style="border-bottom: dotted 1px #777; padding:.05cm 0">';
             $html .= 
                 '<div class="cel10">'.$row['p_name'].'</div>'.
                 '<div class="cel2 lite num">'.$row['um_name'].'</div>'.
+                '<div class="cel0hh num"></div>'.
                 '<div class="cel1h num">'.
                         clean_zeros($row['quantity']).' x</div>'.
                 '<div class="cel1h num">'.
-                    number_format($row['unit_price_stamp'],2).'</div>'.
-                '<div class="cel2 num">'.number_format($amount,2).'</div>';
+                    number_format($row['cost_price'],2).'</div>'.
+                '<div class="cel2 num">'.number_format($cost,2).'</div>';
             $html .= '</div>'.chr(10);
         }
     }
     $html .= break2Html_end($brk, $detail);
-    $html .= orderHtml_end($total_amount, $brk['1_desc_order']);
+    $html .= orderHtml_end($total_cost, $total_amount, $brk['1_desc_order']);
     return $html;
 }
 ?>

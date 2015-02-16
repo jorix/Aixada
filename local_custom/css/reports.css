@@ -39,7 +39,7 @@ h2.start {
     padding:.1cm 0 0 .5cm; 
     border-left:solid 1px #000;
 }
-.cel1, .cel1h, .cel2, .cel2h, .cel3, .cel4, .cel6, .cel8, .cel9, .cel10, .cel12 {
+.cel0hh, .cel1, .cel1h, .cel2, .cel3, .cel4, .cel5, .cel6, .cel8, .cel9, .cel10, .cel12 {
     display:inline-block;
     vertical-align: middle;
     padding: 0 .1cm;
@@ -59,14 +59,14 @@ h2.start {
 .cel6 {
     width:6cm;
 }
+.cel5 {
+    width:5cm;
+}
 .cel4 {
     width:4cm;
 }
 .cel3 {
     width:3cm;
-}
-.cel2h {
-    width:2.2cm;
 }
 .cel2 {
     width:2cm;
@@ -76,6 +76,9 @@ h2.start {
 }
 .cel1 {
     width:1cm;
+}
+.cel0hh {
+    width:.1cm;
 }
 
 /* DATA: aixada_order.revision_status */

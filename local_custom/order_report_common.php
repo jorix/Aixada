@@ -2,8 +2,8 @@
 
 function get_SQL($date_for_order) {
     return 'select'.
-            ' oi.quantity, oi.date_for_order, oi.product_id, 
-                          oi.unit_price_stamp,'.
+            ' oi.quantity, oi.date_for_order, oi.product_id,' .
+            ' oi.unit_price_stamp, p.unit_price cost_price,'.
             ' oi.order_id, o.revision_status,'.
             ' uf_id, uf.name uf_name,'.
             ' p.name p_name, p.provider_id, pv.name pv_name,'.
@@ -57,17 +57,22 @@ function orderHtml_start(&$brk, $row) {
         '['.formatOrderStatus($row['revision_status']).']'.
         '</h2>';
 }
-function orderHtml_end($total_amount, $desc) {
+function orderHtml_end($total_cost, $total_amount, $desc) {
     if ($desc == null) {
         return '';
     }
-    return '<div><br><hr>
-                <div class="lite cel12">'.$desc.'</div>
-                <div class="cel3 num"> Total: </div>
-                <b class="cel3 num">'.
+    return '<div><br><hr>'.
+                '<div class="lite cel8">'.$desc.'</div>'.
+                '<div class="cel0hh"></div>'.
+                '<div class="cel3 num lite">Total Final:</div>'.
+                '<b class="cel2 num">'.
                     number_format($total_amount,2).
-                '</b>
-            </div>';
+                '</b>'.
+                '<div class="cel3 num lite">Total Cost:</div>'.
+                '<div class="cel2 num">'.
+                    number_format($total_cost,2).
+                '</div>'.
+            '</div>';
 }
 function break2Html_end(&$brk, $detail) {
     $html = '';
@@ -84,6 +89,7 @@ function get_sum($db, $brk, $whereSQL, $col_name) {
     $sql_sum = 
         'select'.
             ' sum(oi.quantity) sum_quantity,'.
+            ' round(sum(oi.quantity * p.unit_price),2) sum_cost,'.
             ' round(sum(oi.quantity * oi.unit_price_stamp),2) sum_amount'.
         ' from aixada_order_item oi '.
         ' join (aixada_product p)'.
