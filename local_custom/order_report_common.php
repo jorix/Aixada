@@ -47,13 +47,12 @@ function formatOrderStatus($revision_status) {
     return '<span class="DATA-'.$text_key.'">'.$Text[$text_key].'</span>';
 }
 function orderHtml_start(&$brk, $row) {
-    $startClass = ($brk['1_order_id_n'] == null ? 'start' : '');
     $brk['1_order_id'] = $row['order_id'];
     $brk['1_provider_id'] = $row['provider_id'];
     $brk['1_desc_order'] = $row['pv_name'].
         ': '.$row['date_for_order'].
         ' #'.($row['order_id']==null ? '??' : $row['order_id']);
-    return '<h2 class="'.$startClass.'">'.$brk['1_desc_order'].
+    return '<h2>'.$brk['1_desc_order'].
         '['.formatOrderStatus($row['revision_status']).']'.
         '</h2>';
 }
@@ -61,7 +60,7 @@ function orderHtml_end($total_cost, $total_amount, $desc) {
     if ($desc == null) {
         return '';
     }
-    return '<div><br><hr>'.
+    return '<div class="foot">'.
                 '<div class="lite cel8">'.$desc.'</div>'.
                 '<div class="cel0hh"></div>'.
                 '<div class="cel3 num lite">Total Final:</div>'.
