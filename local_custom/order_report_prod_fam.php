@@ -21,7 +21,15 @@ $detail = ((isset($_GET['detail'])?$_GET['detail']:'S') != 'N');
 <?php
 function write_prod_fam($date_for_order, $detail) {
     $db = DBWrap::get_instance();
-    $strSQL = get_SQL($date_for_order).'p.name, uf.name';
+    //$strSQL = get_SQL($date_for_order).'p.name, uf.name';
+    
+    $strSQL = get_SQL($date_for_order);
+    $cfg = configuration_vars::get_instance();
+    if (isset($cfg->order_review_uf_sequence) && $cfg->order_review_uf_sequence == 'asc') {
+        $strSQL .= 'p.name, uf.id';
+    } else {
+        $strSQL .= 'p.name, uf.id desc';
+    }
     $rs = $db->Execute($strSQL);
     $brk = array(
         'date_for_order' => $date_for_order,
@@ -72,8 +80,9 @@ function write_prod_fam($date_for_order, $detail) {
         if ($detail) {
             $html .= '<div>';
             $html .= '<div class="cel1 num">'.clean_zeros($row['quantity']).'</div>';
-            $html .= '&nbsp;<div class="cel8">'.$row['uf_name'].'#'
-                                               .$row['uf_id'].'</div>';
+            $html .= '&nbsp;<div class="cel8">';
+            $html .= '#'.$row['uf_id'].'-'.$row['uf_name'];//$row['uf_name'].'#'.$row['uf_id'];
+            $html .= '</div>';
             $html .= '</div>'.chr(10);
         }
     }
