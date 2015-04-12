@@ -543,7 +543,10 @@
 				</div>
 				<?php } // - - - - - - - - - - USE SHOP: end ?>
 				<div class="homeIcon index_navOrder">
+                    <!-- XMB canvi icona
 					<a href="shop_and_order.php?what=Order"><img src="img/pedido.png"/></a>
+                    -->
+                    <a href="shop_and_order.php?what=Order"><img src="img/cesta.png"/></a><!-- XMB nova icona -->
 					<p><a href="shop_and_order.php?what=Order"><?php echo $Text['icon_order'];?></a></p>
 				</div>
 				<div class="homeIcon index_navIncidents">
