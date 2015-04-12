@@ -1004,4 +1004,8 @@ $Text['or_click_to_edit_gprice'] = 'Clic per ajustar el preu';
 $Text['or_saving'] = 'Guardant';
 $Text['or_ostat_desc_validated'] = "Els productes d'aquesta comanda han estat validats";
 $Text['os_reopen_order'] = 'Estas segur que vols obre la comanda un altre vegada?';
+
+if (file_exists(__ROOT__.'local_config/lang_custom/ca-va.php')) {
+	include_once(__ROOT__.'local_config/lang_custom/ca-va.php');
+}
 ?>

@@ -1013,4 +1013,7 @@ $Text['or_saving'] = 'Guardando';
 $Text['or_ostat_desc_validated'] = 'Los productos de este pedido han sido validados';
 $Text['os_reopen_order'] = 'Estás seguro de re-abrir el pedido?';
 
+if (file_exists(__ROOT__.'local_config/lang_custom/es.php')) {
+	include_once(__ROOT__.'local_config/lang_custom/es.php');
+}
 ?>
