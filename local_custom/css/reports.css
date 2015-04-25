@@ -32,6 +32,10 @@ h2.start {
 .lite div {
     font-size:10pt;
 }
+.aprov {
+	text-align: right;
+	font-style: italic;
+}
 .block {
     page-break-inside: avoid;
     margin:.5cm 0 0 0; 
@@ -41,7 +45,7 @@ h2.start {
     margin:.5cm 0 1cm 0;
     border-bottom:solid 1px #000;
 }
-.foot .lite{
+.gray{
     color:#888;
 }
 .block-body{
