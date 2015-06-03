@@ -4,7 +4,7 @@ function get_SQL($date_for_order) {
     return "select * from (
 		select
 			oi.date_for_order, oi.product_id,
-			ifnull(os.quantity, oi.quantity) quantity,
+			if(os.quantity is not null, os.quantity*os.arrived, oi.quantity) quantity,
 			ifnull(os.unit_price_stamp, oi.unit_price_stamp) final_price, 
 			if( os.unit_price_stamp is not null,
 				round(
@@ -82,7 +82,7 @@ function break2Html_end(&$brk, $detail) {
 function get_sum($db, $date_for_order, $provider_id, $order_id, $whereSQL) {
     $sql = 
         "select 
-			ifnull(os.quantity, oi.quantity) quantity,
+			if(os.quantity is not null, os.quantity*os.arrived, oi.quantity) quantity,
 			ifnull(os.unit_price_stamp, oi.unit_price_stamp) final_price, 
 			if( os.unit_price_stamp is not null,
 				round(
