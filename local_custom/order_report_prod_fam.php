@@ -28,7 +28,7 @@ function write_prod_fam($date_for_order, $detail) {
     if (isset($cfg->order_review_uf_sequence) && $cfg->order_review_uf_sequence == 'asc') {
         $strSQL .= 'pv_name, order_id, p_name, uf_id';
     } else {
-        $strSQL .= 'p_name, uf_id desc';
+        $strSQL .= 'pv_name, order_id, p_name, uf_id desc';
     }
     $rs = $db->Execute($strSQL);
     $brk = array(

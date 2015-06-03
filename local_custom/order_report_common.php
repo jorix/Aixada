@@ -30,10 +30,12 @@ function get_SQL($date_for_order) {
 			p.unit_measure_order_id = um.id and
 			p.provider_id = pv.id
 		left join (
-			aixada_order o,
+			aixada_order o )
+		on 
+			oi.order_id=o.id
+		left join (
 			aixada_order_to_shop os )
 		on 
-			oi.order_id=o.id and
 			oi.id = os.order_item_id
 		where oi.date_for_order='{$date_for_order}'
 	) r
