@@ -3,23 +3,21 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=$language;?>" lang="<?=$language;?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title><?php echo $Text['global_title'] . " - " . $Text['head_ti_torn']; ?></title>
+	<title><?php 
+            $page_title = 'Repartiment de comandes';
+      		echo $Text['global_title'] . " - " . $page_title;  ?></title>
 
  	<link rel="stylesheet" type="text/css"   media="screen" href="../css/aixada_main.css" />
   	<link rel="stylesheet" type="text/css"   media="screen" href="../js/fgmenu/fg.menu.css"   />
     <link rel="stylesheet" type="text/css"   media="screen" href="../css/ui-themes/<?=$default_theme;?>/jqueryui.css"/>
      
-    
-    <?php if (isset($_SESSION['dev']) && $_SESSION['dev'] == true ) { ?> 
-	    <script type="text/javascript" src="../js/jquery/jquery.js"></script>
-		<script type="text/javascript" src="../js/jqueryui/jqueryui.js"></script>
-		<script type="text/javascript" src="../js/fgmenu/fg.menu.js"></script>
-		<script type="text/javascript" src="../js/aixadautilities/jquery.aixadaMenu.js"></script>     	 
-	   	<script type="text/javascript" src="../js/aixadautilities/jquery.aixadaXML2HTML.js" ></script>
-	   	<script type="text/javascript" src="../js/aixadautilities/jquery.aixadaUtilities.js" ></script>
-   	<?php  } else { ?>
-	   	<script type="text/javascript" src="../js/js_for_torn.min.js"></script>
-    <?php }?>
+    <script type="text/javascript" src="../js/jquery/jquery.js"></script>
+    <script type="text/javascript" src="../js/jqueryui/jqueryui.js"></script>
+    <script type="text/javascript" src="../js/fgmenu/fg.menu.js"></script>
+    <script type="text/javascript" src="../js/aixadautilities/jquery.aixadaMenu.js"></script>     	 
+    <script type="text/javascript" src="../js/aixadautilities/jquery.aixadaXML2HTML.js" ></script>
+    <script type="text/javascript" src="../js/aixadautilities/jquery.aixadaUtilities.js" ></script>
+
 <?php
     $db = DBWrap::get_instance();
     $rs = $db->Execute(
@@ -137,7 +135,7 @@
             <div>
             <?php } // END ?>
             <div class="aix-style-entry-widget">
-                <h2>Proveïdors i Unitats Familiars</h2>
+                <h2>Informació d'interès</h2>
 				<table>
                 <tr>
                     <td><button class="aix-layout-fixW150"
@@ -146,7 +144,20 @@
                         Directori
                     </button></td>
 					<td><p>
-                        Relació d'emails i telèfons.
+                        Relació d'emails i telèfons de proveïdors i famílies.
+                    </p></td>
+				</tr>
+                <tr>
+                    <td><button class="aix-layout-fixW150"
+                            onclick="window.open('turns_report.php','_blank');"
+                            >
+                        Torns
+                    </button></td>
+					<td><p>
+                        Dates i UF assignades per fer els repartiments. 
+                        <button class="aix-layout-fixW150"
+                            onclick="window.location.href = '../manage_data.php?table=cistella_turn'";
+                            >Dades</button>
                     </p></td>
 				</tr>
                 </table>
