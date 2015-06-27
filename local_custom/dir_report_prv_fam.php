@@ -48,7 +48,7 @@ function write_ufs() {
         }
         $html .= '<div class="cel6">'.$row['m_name'].
                             ' ('.$row['login'].')</div>';
-        $html .= '<div class="cel6">'.$row['email'].'</div>';
+        $html .= '<div class="cel6">'.str_replace('@','<span style="display:inline-block; width:0px"></span>@',$row['email']).'</div>';
         $html .= '<div class="cel2">'.$row['phone1'].'</div>';
         $html .= '</div>'.chr(10);
     }
@@ -70,7 +70,7 @@ function write_prv() {
         $html .= '<div class="block" style="margin: 0.3cm; border-top:1px solid #ccc;">';
         $html .= '<div class="cel4">'.$row['name'].'</div>';
         $html .= '<div class="cel6">'.$row['contact'].'</div>';
-        $html .= '<div class="cel6">'.$row['email'].'</div>';
+        $html .= '<div class="cel6">'.str_replace('@','<span style="display:inline-block; width:0px"></span>@',$row['email']).'</div>';
         $html .= '<div class="cel2">'.$row['phone1'].'</div>';
         $html .= '</div>'.chr(10);
     }
