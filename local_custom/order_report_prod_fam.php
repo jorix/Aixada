@@ -60,10 +60,11 @@ function write_prod_fam($date_for_order, $detail) {
             $html .= break2Html_end($brk, $detail);
             // start uf
             $brk['2_id_break'] = $row['product_id'];
-            $sum_quantity = get_sum($db, 
+            $sum_quantity_row = get_sum($db, 
 				$brk['date_for_order'], 
 				$brk['1_provider_id'], $brk['1_order_id'],
-				'oi.product_id = '.$brk['2_id_break'])['sum_quantity'];
+				'oi.product_id = '.$brk['2_id_break']);
+			$sum_quantity = $sum_quantity_row['sum_quantity'];
 			// Rounded by product
 			$total_cost += round($row['cost_price']*$sum_quantity, 2);
             $html .= '<div class="block">';
