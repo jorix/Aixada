@@ -516,7 +516,9 @@ class configuration_vars {
                    'may_view_all_accounts'),
              
              'Logistic Commission' =>
-             array('may_edit_incident'),
+             array('may_edit_incident',
+                   'may_edit_cistella_turn'
+             ),
              
              'Hacker Commission' =>
              array('may_edit_user', 
