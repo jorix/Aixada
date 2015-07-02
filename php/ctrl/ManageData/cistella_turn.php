@@ -19,29 +19,31 @@ class data_manager extends abstract_data_manager {
                 name:'date_turn', label:'Data torn',
                 width:'120', align:'center',
                 editrules:{date:true, required:true}
-             }, {
-                // Requetit ja que el desplegable no mostra el valor seleccionar si s'usa formatter:'select'
-                name:'uf_name', label:'Unitat familiar',
-                width:'350',
-                editable:false
             }, {
                 name:'uf_id', label:'Unitat familiar',
-                // width:'350',
+                width:'350',
                 editrules: {required:true,edithidden:true,searchhidden:true},
-                edittype: 'select', //formatter:'select',
+                edittype: 'select', formatter: 'select',
                 editoptions: {
-                    dataUrl:'php/ctrl/ManageData_select.php?table=aixada_uf_active'
-                }   
+                    value:".$this->get_select_values(
+                        "select uf.id, CONCAT( uf.name, ' #', uf.id)
+                            from aixada_uf uf where uf.active=1
+                            order by uf.name",
+                        'sel_uf'
+                    )."
+                }
         }]";
     }
-    protected function sql() {
-        // Requetit ja que el desplegable no mostra el valor seleccionar si s'usa formatter:'select'
-        return
-            "select
-                t01.id, t01.uf_id, t01.date_turn, t01.ts,
-                uf.name as uf_name
-            from cistella_turn t01
-            left join aixada_uf uf on t01.uf_id=uf.id";
+    function get_select_values($strSQL, $desc_blank_value='(...)') {
+        $values = '';
+        if ($desc_blank_value) {
+            $values .= ",'':'".i18n_js($desc_blank_value)."'";
+        }
+        $rs = DBWrap::get_instance()->Execute($strSQL);
+        while ($row = $rs->fetch_array()) {
+            $values .= ",{$row[0]}:'".to_js_str($row[1])."'";
+        }
+        return "{".($values !== ''? substr($values,1) : '')."}";
     }
 }
 ?>
