@@ -96,6 +96,16 @@ class configuration_vars {
    * @var boolean
    */  
   public $validate_show_carts = 'week';
+
+  /**
+   * Allows create a empty cart at validation. This is usefully to assign
+   *    products to a UF with no orders and no shop or when is used the
+   *    option `$order_distribution_method = 'distribute_and_validate'`.
+   * If is true a button "Create cart" is displayed when is select a UF without
+   *    not validated carts (default value is false)
+   * @var boolean
+   */  
+  public $validate_btn_create_carts = true;
  
   /**
    * 
@@ -683,7 +693,7 @@ class configuration_vars {
 	//E.G.:
 		//'account_operations' => array('pay_pr','refund_uf','deposit_uf'),
 	
-	// Whith 'use_providers' key lets you choose whether providers accounts are
+	// With 'use_providers' key lets you choose whether providers accounts are
 	// used, disabling the operations of providers not appear.
 	// NOTE: This key has priority over 'account_operations'.
 		'use_providers' => true
