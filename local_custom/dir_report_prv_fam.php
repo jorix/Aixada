@@ -25,19 +25,21 @@ function write_ufs() {
         ' us.login, us.email, m.phone1 from aixada_uf uf'.
         ' join (aixada_user us, aixada_member m)'.
         ' on (uf.id=m.uf_id and m.id=us.member_id)'.
-        ' where uf.active=1 and m.active=1 and m.phone1 <> "1"'.
+        ' where uf.active=1 and m.active=1'.
         ' order by uf.name, m.name, us.login';
     $rs = $db->Execute($strSQL);
     $brk = array(
         '1_uf_id' => null
     );
     $html = '';
+    $uf_count = 0;
     while ($row = $rs->fetch_array()) {
         if ($brk['1_uf_id'] != $row['uf_id']) {
             if ($brk['1_uf_id'] != null) {
                 $html .= '</div>'.chr(10);
             }
             $brk['1_uf_id'] = $row['uf_id'];
+            $uf_count++;
             $html .= '<div class="block" style="margin: 0.3cm; border-top:1px solid #ccc;">';
             $html .= '<div>';
             $html .= '<div class="cel4">'.$row['uf_name'].
@@ -53,6 +55,7 @@ function write_ufs() {
         $html .= '</div>'.chr(10);
     }
     if ($brk['1_uf_id'] != null) {
+        $html .= "<div style=\"text-align: center;\">UFs actives = {$uf_count}</div>".chr(10);
         $html .= '</div>'.chr(10);
     }
     return $html;
