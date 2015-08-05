@@ -55,8 +55,8 @@ function write_ufs() {
         $html .= '</div>'.chr(10);
     }
     if ($brk['1_uf_id'] != null) {
-        $html .= "<div style=\"text-align: center; margin: 0.3cm; border-top:1px solid #ccc;\">UFs actives = {$uf_count}</div>".chr(10);
         $html .= '</div>'.chr(10);
+        $html .= "<div style=\"text-align: center; margin: 0.3cm; border-top:1px solid #ccc;\">UFs actives = {$uf_count}</div>".chr(10);
     }
     return $html;
 }
