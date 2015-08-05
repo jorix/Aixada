@@ -48,14 +48,14 @@ function write_ufs() {
             $html .= '<div>';
             $html .= '<div class="cel4">&nbsp;</div>';
         }
+        $html .= '<div class="cel2">'.$row['phone1'].'</div>';
         $html .= '<div class="cel6">'.$row['m_name'].
                             ' ('.$row['login'].')</div>';
         $html .= '<div class="cel6">'.str_replace('@','<span style="display:inline-block; width:0px"></span>@',$row['email']).'</div>';
-        $html .= '<div class="cel2">'.$row['phone1'].'</div>';
         $html .= '</div>'.chr(10);
     }
     if ($brk['1_uf_id'] != null) {
-        $html .= "<div style=\"text-align: center;\">UFs actives = {$uf_count}</div>".chr(10);
+        $html .= "<div style=\"text-align: center; margin: 0.3cm; border-top:1px solid #ccc;\">UFs actives = {$uf_count}</div>".chr(10);
         $html .= '</div>'.chr(10);
     }
     return $html;
@@ -72,11 +72,12 @@ function write_prv() {
     while ($row = $rs->fetch_array()) {
         $html .= '<div class="block" style="margin: 0.3cm; border-top:1px solid #ccc;">';
         $html .= '<div class="cel4">'.$row['name'].'</div>';
+        $html .= '<div class="cel2">'.$row['phone1'].'</div>';
         $html .= '<div class="cel6">'.$row['contact'].'</div>';
         $html .= '<div class="cel6">'.str_replace('@','<span style="display:inline-block; width:0px"></span>@',$row['email']).'</div>';
-        $html .= '<div class="cel2">'.$row['phone1'].'</div>';
         $html .= '</div>'.chr(10);
     }
+    $html .= '<div style="margin: 0.3cm; border-top:1px solid #ccc;">&nbsp;</div>';
 
     return $html;
 }
