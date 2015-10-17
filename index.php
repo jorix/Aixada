@@ -552,7 +552,7 @@
 
 				<!-- EFS-ini: añadimos la opción imprimir pedido disponible para todos -->
 				<div class="homeIcon">
-					<a href="incidents.php"><img src="img/validar.png"/></a>
+					<a href="local_custom/order_send.php"><img src="img/validar.png"/></a>
 					<p><a href="local_custom/order_send.php"><?php echo $Text['icon_print'];?></a></p>
 				</div>
 				<!-- EFS-fin -->
