@@ -11,7 +11,8 @@ $detail = ((isset($_GET['detail'])?$_GET['detail']:'S') != 'N');
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title><?php echo 'Fam-Prod '.$date_for_order.($detail?'':' summary');?></title>
-	<link rel="stylesheet" type="text/css"               href="css/reports.css" />
+	<link rel="stylesheet" type="text/css"               href="css/reports_paper.css"/>
+    <link rel="stylesheet" type="text/css"               href="css/reports_layout.css"/>
   	<link rel="stylesheet" type="text/css" media="print" href="css/reports-print.css"/>
 </head>
 <body>

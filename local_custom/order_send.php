@@ -1,4 +1,7 @@
-<?php include "../php/inc/header.inc.php" ?>
+<?php 
+    require_once("../php/inc/header.inc.php");
+    require_once("php/inc/turns_report.php");
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=$language;?>" lang="<?=$language;?>">
 <head>
@@ -10,6 +13,7 @@
  	<link rel="stylesheet" type="text/css"   media="screen" href="../css/aixada_main.css" />
   	<link rel="stylesheet" type="text/css"   media="screen" href="../js/fgmenu/fg.menu.css"   />
     <link rel="stylesheet" type="text/css"   media="screen" href="../css/ui-themes/<?=$default_theme;?>/jqueryui.css"/>
+    <link rel="stylesheet" type="text/css"                  href="css/reports_layout.css" />
      
     <script type="text/javascript" src="../js/jquery/jquery.js"></script>
     <script type="text/javascript" src="../js/jqueryui/jqueryui.js"></script>
@@ -17,7 +21,17 @@
     <script type="text/javascript" src="../js/aixadautilities/jquery.aixadaMenu.js"></script>     	 
     <script type="text/javascript" src="../js/aixadautilities/jquery.aixadaXML2HTML.js" ></script>
     <script type="text/javascript" src="../js/aixadautilities/jquery.aixadaUtilities.js" ></script>
-
+    <style>
+        .aix-style-entry-widget {margin-bottom:0; margin-top: 20px;}
+        .uf_turns {
+            color:#555;
+            font-size:11pt;
+        }
+        tr.uf_turns td {
+            padding-top:0;
+            padding-bottom:0;
+        }
+    </style>
 <?php
     $db = DBWrap::get_instance();
     $rs = $db->Execute(
@@ -104,27 +118,22 @@
                         Prod-Fam
                     </button></td>
 					<td><p>
-                        Per fer el repartiment dels productes.
+                        Relació de Productes i detall de les Famílies que en demanen.<br>
+                        <span style="color:#555">Useu aquest informe per fer el repartiment!</span>
                     </p></td>
 				</tr>
-                <tr>
-                    <td><button class="aix-layout-fixW150"
+                <tr style="color:#555">
+                    <td><button class="aix-layout-fixW150" style="color:#555"
                             onclick="window.open('order_report_fam_prod.php?date=<?php echo $for_date; ?>','_blank');"
-                            >
-                        Fam-Prod
-                    </button></td>
+                            >Fam-Prod
+                        </button>
+                    </td>
 					<td><p>
-                        Per anotar els comptes de les families.
-                    </p></td>
-				</tr>
-                <tr>
-                    <td><button class="aix-layout-fixW150"
+                        Relació de Famílies amb els Productes demanats.
+                        <button class="aix-layout-fixW100" style="color:#555"
                             onclick="window.open('order_report_fam_prod.php?detail=N&date=<?php echo $for_date; ?>','_blank');"
-                            >
-                        Resum Fam
-                    </button></td>
-					<td><p>
-                        Resum de l'import total (apox.) per famílies.
+                            >Resum
+                        </button>
                     </p></td>
 				</tr>
                 </table>
@@ -138,26 +147,30 @@
                 <h2>Informació d'interès</h2>
 				<table>
                 <tr>
+                    <td style="padding-bottom:0" ><button class="aix-layout-fixW150"
+                            onclick="window.open('turns_report.php','_blank');"
+                            >
+                        Torns
+                    </button></td>
+					<td style="padding-bottom:0" ><p>
+                        Calendari de torns de UFs per fer repartiments.
+                        <button class="aix-layout-fixW100"
+                            onclick="window.location.href = '../manage_data.php?table=cistella_turn'";
+                            >Dades</button>
+                    </p></td>                    
+				</tr>
+                <tr class="uf_turns"><td colspan="2">Els teus pròxims torns:
+                    <?php
+                        echo write_turn_uf(get_session_uf_id(), $for_date)
+                    ?></td></tr>
+                <tr>
                     <td><button class="aix-layout-fixW150"
                             onclick="window.open('dir_report_prv_fam.php','_blank');"
                             >
                         Directori
                     </button></td>
 					<td><p>
-                        Relació d'emails i telèfons de proveïdors i famílies.
-                    </p></td>
-				</tr>
-                <tr>
-                    <td><button class="aix-layout-fixW150"
-                            onclick="window.open('turns_report.php','_blank');"
-                            >
-                        Torns
-                    </button></td>
-					<td><p>
-                        Dates i UF assignades per fer els repartiments. 
-                        <button class="aix-layout-fixW150"
-                            onclick="window.location.href = '../manage_data.php?table=cistella_turn'";
-                            >Dades</button>
+                        Emails i telèfons dels proveïdors i les famílies.
                     </p></td>
 				</tr>
                 </table>
