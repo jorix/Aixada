@@ -29,7 +29,6 @@
         }
         tr.uf_turns td {
             padding-top:0;
-            padding-bottom:0;
         }
     </style>
 <?php
@@ -159,9 +158,13 @@
                             >Dades</button>
                     </p></td>                    
 				</tr>
-                <tr class="uf_turns"><td colspan="2">Els teus pròxims torns:
+                <tr class="uf_turns"><td colspan="2">
                     <?php
-                        echo write_turn_uf(get_session_uf_id(), $for_date)
+                        $text_turns = write_turn_uf(get_session_uf_id(), $for_date);
+                        if ($text_turns !="") {
+                            echo "Els teus pròxims torns:";
+                            echo $text_turns;                            
+                        }
                     ?></td></tr>
                 <tr>
                     <td><button class="aix-layout-fixW150"
