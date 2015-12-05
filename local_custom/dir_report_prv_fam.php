@@ -43,16 +43,16 @@ function write_ufs() {
             $uf_count++;
             $html .= '<div class="block" style="margin: 0.3cm; border-top:1px solid #ccc;">';
             $html .= '<div>';
-            $html .= '<div class="cel4">'.$row['uf_name'].
-                        '#'.$row['uf_id'].'</div>';
+            $html .= '<span class="cel4">'.$row['uf_name'].
+                        '#'.$row['uf_id'].'</span>';
         } else {
             $html .= '<div>';
-            $html .= '<div class="cel4">&nbsp;</div>';
+            $html .= '<span class="cel4">&nbsp;</span>';
         }
-        $html .= '<div class="cel2">'.$row['phone1'].'</div>';
-        $html .= '<div class="cel6">'.$row['m_name'].
-                            ' ('.$row['login'].')</div>';
-        $html .= '<div class="cel6">'.str_replace('@','<span style="display:inline-block; width:0px"></span>@',$row['email']).'</div>';
+        $html .= '<span class="cel2">'.$row['phone1'].'</span>';
+        $html .= '<span class="cel6">'.$row['m_name'].
+                            ' ('.$row['login'].')</span>';
+        $html .= '<span class="cel6">'.str_replace('@','<span style="display:inline-block; width:0px"></span>@',$row['email']).'</span>';
         $html .= '</div>'.chr(10);
     }
     if ($brk['1_uf_id'] != null) {

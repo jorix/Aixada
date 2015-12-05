@@ -4,7 +4,8 @@
 .lite {
     font-size:10pt;
 }
-.lite div {
+.lite div,
+.lite span {
     font-size:10pt;
 }
 .aprov {
