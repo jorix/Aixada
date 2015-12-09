@@ -29,10 +29,14 @@
     padding:.1cm 0 0 .5cm; 
     border-left:solid 1px #000;
 }
-.cel0hh, .cel1, .cel1h, .cel2, .cel3, .cel4, .cel5, .cel6, .cel8, .cel9, .cel10, .cel12 {
+.cel0hh, .cel1, .cel1h, .cel2, .cel3, .cel3h, .cel4, .cel5,
+.cel6, .cel8, .cel9, .cel10, .cel12, .cel13 {
     display:inline-block;
     vertical-align: middle;
     padding: 0 .1cm;
+}
+.cel13 {
+    width:13cm;
 }
 .cel12 {
     width:12cm;
@@ -54,6 +58,9 @@
 }
 .cel4 {
     width:4cm;
+}
+.cel3h {
+    width:3.5cm;
 }
 .cel3 {
     width:3cm;

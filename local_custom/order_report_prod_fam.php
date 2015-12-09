@@ -81,7 +81,6 @@ function write_order_prod_fam($date_for_order, $provider_id, $order_id, $detail,
         '2_id_break' => null
     );
     $total_cost = 0;
-    $total_costUF = 0;
     $total_amount = 0;
     $aaa_quantity =0;
     $html = '';
@@ -90,11 +89,10 @@ function write_order_prod_fam($date_for_order, $provider_id, $order_id, $detail,
                     $brk['1_order_id'] != $row['order_id']) {
             // end previus order
             $html .= break2Html_end($brk, $detail);
-            $html .= orderHtml_end($total_cost, $total_costUF,
-                    $total_amount, $brk['1_desc_order']);
+            $html .= orderHtml_end($total_cost, $total_amount, 
+                $brk['1_desc_order']);
             // start order
             $total_cost = 0;
-            $total_costUF = 0;
             $total_amount = 0;
             $html_h = orderHtml_start($brk, $row);
             if ($head) {
@@ -117,10 +115,10 @@ function write_order_prod_fam($date_for_order, $provider_id, $order_id, $detail,
             } else {
                 $html .= '<div class="block" style="margin-top: 0.25cm">';
             }
-            $html .= '<h3><div class="cel9">'.$row['p_name'].'</div>'.
-                '<div class="cel0hh"></div><div class="cel0hh"></div>'.
-                '<div class="cel3 lite num">'.$row['um_name'].'</div>'.
-                '<div class="cel1h num">'.
+            $html .= '<h3><div class="cel13">'.$row['p_name'].
+                    '<div class="lite" style="float:right">'.$row['um_name'].'</div>'.
+                '</div>'.
+                '<div class="cel1 num">'.
                     clean_zeros($sum_quantity).'</div>'.
                 'x<div class="cel1h aprov">'.
                     number_format($row['cost_price'], 2).'</div>'.
@@ -132,7 +130,6 @@ function write_order_prod_fam($date_for_order, $provider_id, $order_id, $detail,
             }
         }
         // Rounded by UF
-        $total_costUF += round($row['cost_price']*$row['quantity'], 2);
         $total_amount += round($row['final_price']*$row['quantity'], 2);
         if ($detail) {
             $html .= '<div>';
@@ -145,8 +142,8 @@ function write_order_prod_fam($date_for_order, $provider_id, $order_id, $detail,
     }
     $html .= break2Html_end($brk, $detail);
     if ($foot) {
-        $html .= orderHtml_end(
-            $total_cost, $total_costUF, $total_amount, $brk['1_desc_order']);
+        $html .= orderHtml_end($total_cost, $total_amount, 
+            $brk['1_desc_order']);
     }
     echo $html;
 }
@@ -172,7 +169,6 @@ function write_order_fam_prod(
         '2_id_break' => null
     );
     $total_cost = 0;
-    $total_costUF = 0;
     $total_amount = 0;
     $aaa_quantity =0;
     $sum_quantity=0;
@@ -182,11 +178,10 @@ function write_order_fam_prod(
                     $brk['1_order_id'] != $row['order_id']) {
             // end previus order
             $html .= break2Html_end($brk, $detail);
-            $html .= orderHtml_end($total_cost, $total_costUF,
-                    $total_amount, $brk['1_desc_order']);
+            $html .= orderHtml_end($total_cost, $total_amount, 
+                $brk['1_desc_order']);
             // start order
             $total_cost = 0;
-            $total_costUF = 0;
             $total_amount = 0;
             $html_h = orderHtml_start($brk, $row);
             if ($head) {
@@ -207,7 +202,6 @@ function write_order_fam_prod(
             }
         }
         // Rounded by UF
-        $total_costUF += round($row['cost_price']*$row['quantity'], 2);
         $total_amount += round($row['final_price']*$row['quantity'], 2);
         $total_cost += round($row['cost_price']*$row['quantity'], 2);
         if ($detail) {
@@ -229,8 +223,8 @@ function write_order_fam_prod(
     }
     $html .= break2Html_end($brk, $detail);
     if ($foot || true) {
-        $html .= orderHtml_end(
-            $total_cost, $total_costUF, $total_amount, $brk['1_desc_order']);
+        $html .= orderHtml_end($total_cost, $total_amount,
+            $brk['1_desc_order']);
     }
     echo $html;
 }
@@ -244,21 +238,19 @@ function orderHtml_start(&$brk, $row) {
         '['.formatOrderStatus($row['revision_status']).']'.
         '</h2>';
 }
-function orderHtml_end($total_cost, $total_costUF, $total_amount, $desc) {
+function orderHtml_end($total_cost, $total_amount, $desc) {
     if ($desc == null) {
         return '';
     }
     return '<div class="foot">'.
-                '<div class="cel6 lite gray">'.$desc.'</div>'.
-                '<div class="cel0hh"></div>'.
-                '<div class="cel4 num lite gray"><br>Total Final UFs:</div>'.
-                '<b class="cel2 num gray"><br>'.
+                '<div class="cel8 lite gray">'.$desc.'</div>'.
+                '<div class="cel3 num lite gray">Total Final UFs:</div>'.
+                '<span class="cel2 num gray">'.
                     number_format($total_amount,2).
-                '</b>'.
-                '<div class="cel4 num lite gray">Total Cost:<br>Cost arrodonit a UF:</div>'.
+                '</span>'.
+                '<div class="cel3 num lite gray">Cost sense IVA:</div>'.
                 '<div class="cel2 aprov">'.
-                    number_format($total_cost,2).'<br><span class="gray">'.
-                    number_format($total_costUF,2).'</span>'.
+                    number_format($total_cost,2).
                 '</div>'.
             '</div>';
 }
