@@ -1,6 +1,9 @@
 .num {
     text-align: right;
 }
+.center {
+    text-align: center;
+}
 .lite {
     font-size:10pt;
 }
@@ -29,7 +32,7 @@
     padding:.1cm 0 0 .5cm; 
     border-left:solid 1px #000;
 }
-.cel0hh, .cel1, .cel1h, .cel2, .cel3, .cel3h, .cel4, .cel5,
+.cel0hh, .cel0h, .cel1, .cel1h, .cel2, .cel3, .cel3h, .cel4, .cel5,
 .cel6, .cel8, .cel9, .cel10, .cel12, .cel13 {
     display:inline-block;
     vertical-align: middle;
@@ -73,6 +76,9 @@
 }
 .cel1 {
     width:1cm;
+}
+.cel0h {
+    width:.5cm;
 }
 .cel0hh {
     width:.1cm;
