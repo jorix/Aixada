@@ -66,6 +66,9 @@ function write_prv() {
     $strSQL = 'select id, name, contact, email, phone1'.
         ' from aixada_provider'.
         ' where active=1'.
+        ' and (contact <> \'\' '.
+            ' or email <> \'\' '.
+            ' or phone1 <> \'\') '.
         ' order by name';
     $rs = $db->Execute($strSQL);
 
