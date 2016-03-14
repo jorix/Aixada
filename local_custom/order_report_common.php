@@ -3,6 +3,7 @@
 function get_SQL($date_for_order, $provider_id, $order_id) {
     $sql = "select 	
             oi.date_for_order, oi.product_id,
+            oi.quantity orderQuantity,
             if(os.quantity is not null, os.quantity*os.arrived, oi.quantity) quantity,
             ifnull(os.unit_price_stamp, oi.unit_price_stamp) final_price, 
             if( os.unit_price_stamp is not null,
@@ -70,7 +71,9 @@ function getSumaryOrders_SQL($date_for_order, $provider_id, $order_id) {
         left join aixada_order_to_shop os
             on oi.id = os.order_item_id
         where ";
-    if ($order_id !== -1 && $order_id !== null) {   // order_id
+    if (is_array($order_id)) {   // order_id
+        $sql .= 'oi.order_id in(' . implode(',', $order_id) . ')';
+    } elseif ($order_id !== -1 && $order_id !== null) {   // order_id
         $sql .= "oi.order_id='{$order_id}'";
     } elseif ($date_for_order !== null) { 	        // date for orrder
         $sql .= "oi.date_for_order='{$date_for_order}'";
@@ -133,7 +136,8 @@ function break2Html_end(&$brk, $detail) {
 }
 function get_sum($db, $date_for_order, $provider_id, $order_id, $whereSQL) {
     $sql = 
-        "select 
+        "select
+            oi.quantity orderQuantity,
             if(os.quantity is not null, os.quantity*os.arrived, oi.quantity) quantity,
             ifnull(os.unit_price_stamp, oi.unit_price_stamp) final_price, 
             if( os.unit_price_stamp is not null,
@@ -162,6 +166,7 @@ function get_sum($db, $date_for_order, $provider_id, $order_id, $whereSQL) {
     }
     $sql_sum = "
         select 
+            sum(orderQuantity) sum_orderQuantity,
             sum(quantity) sum_quantity,
             sum(round(quantity * cost_price, 2)) sum_cost,
             sum(round(quantity * final_price, 2)) sum_amount 
