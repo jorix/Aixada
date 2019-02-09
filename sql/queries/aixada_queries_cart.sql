@@ -8,7 +8,7 @@ delimiter |
  * that have not a ts_validated timestamp.
  */
 drop procedure if exists get_shop_cart|
-create procedure get_shop_cart(in the_date_for_shop date, in the_uf_id int, in the_cart_id int, in validated boolean)
+create procedure get_shop_cart(in the_date_for_shop varchar(15), in the_uf_id int, in the_cart_id int, in validated boolean)
 begin
 
   declare wherec varchar(255) default "";

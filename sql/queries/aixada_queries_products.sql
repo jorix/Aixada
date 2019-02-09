@@ -561,7 +561,7 @@ drop procedure if exists get_products_detail|
 create procedure get_products_detail(in the_provider_id int, 
        		 		     in the_category_id int, 
 				     in the_like varchar(255),
-				     in the_date date,
+				     in the_date varchar(15),
 				     in include_inactive boolean,
 				     in the_product_id int)
 begin
@@ -579,7 +579,7 @@ begin
    
     
     /** no date provided we assume that we are shopping, i.e. all active products are shown stock + orderable **/
-    if the_date = 0 then
+    if the_date = '0' then
     	set wherec = concat(wherec, " and p.unit_measure_shop_id = u.id ");
         /** hack: the_product_id=-1 works to exclude products as notes **/
         if the_product_id = -1 then
