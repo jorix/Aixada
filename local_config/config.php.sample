@@ -575,6 +575,20 @@ class configuration_vars {
   
              
     /**
+     * Character encoding used to export CSV, default is "UTF-8" without BOM. 
+     *
+     * See valid codes in: 
+     *    * http://php.net/manual/en/mbstring.supported-encodings.php
+     *    
+     * To use UTF-8 with BOM put character set as: "UTF-8+BOM"
+     *
+     * NOTE: 'Windows-1252' Is character encoding of Latin alphabet
+     *       used by Windows systems.
+     */
+    public $export_csv_char_encoding = '';
+    
+    
+    /**
      *  IMPORT CONTROLS
      */
     

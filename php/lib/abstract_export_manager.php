@@ -154,7 +154,12 @@ class abstract_export_manager {
      * Returns the CSV file for the export data and creates local public copy in 
      * export directory. 
      */
-    private function write_csv($download=true){
+    private function write_csv($download=true, $p_char_encoding='$cfg'){
+
+    	$csv_char_encoding = '';
+    	if ($p_char_encoding == '$cfg') {
+    	    $csv_char_encoding = get_config("export_csv_char_encoding", $csv_char_encoding);
+    	}
     	
     	$this->format = 'csv';
 		if (pathinfo($this->filename, PATHINFO_EXTENSION) != 'csv') {
@@ -170,7 +175,7 @@ class abstract_export_manager {
     	$this->csv_result = $this->xml2csv(); 
     	
     	//publish to this web
-    	$this->publish_copy();
+    	$this->publish_copy($csv_char_encoding);
 
     	if($download){
 		 	//offer file for download
@@ -181,8 +186,7 @@ class abstract_export_manager {
 			header('Cache-Control: no-cache, must-revalidate');
 			header('Expires: '. date(DATE_RFC822, time() - 3600));
 			$fp = fopen('php://output', 'w');
-			foreach ($this->csv_result as $row) 
-			    fputcsv($fp, $row);
+			$this->handle_to_csv($fp, $csv_char_encoding);
 			fclose($fp);
     	}
     	
@@ -275,7 +279,19 @@ class abstract_export_manager {
             
     }
     
-    
+    private function handle_to_csv($fp, $csv_char_encoding) 
+    {
+        if (strcasecmp($csv_char_encoding, "UTF-8+BOM") == 0) {
+            fprintf($fp, chr(0xEF).chr(0xBB).chr(0xBF));
+            $char_encoding = '';
+        } else {
+            $char_encoding = $csv_char_encoding;
+        }
+        foreach ($this->csv_result as $row) {
+            self::decode_utf8($row, $char_encoding);
+            fputcsv($fp, $row);
+        }
+    }
    
     
     /**
@@ -283,7 +299,7 @@ class abstract_export_manager {
      * Creates a local public available copy of the export file for easy
      * sharing, importing by other platform.  
      */
-    private function publish_copy(){
+    private function publish_copy($csv_char_encoding = ''){
     	
     	if (!$this->publish) return false; 
     	
@@ -296,9 +312,7 @@ class abstract_export_manager {
 	    switch($this->format){
 	    	
 	    	case "csv":
-	    		foreach ($this->csv_result as $row) {
-	      			fputcsv($outhandle, $row);
-		  		}
+		  		$this->handle_to_csv($outhandle, $csv_char_encoding);
 		  		break;
 	    	case "xml":
 	    		fwrite($outhandle, $this->xml_result);	
@@ -380,6 +394,20 @@ class abstract_export_manager {
 	}
     
 	
+    public static function decode_utf8(&$array, $to_char_decode)
+    {
+        if ($to_char_decode != '') {
+            array_walk(
+                $array, 
+                function(&$string, $index, $char_code) {
+                    $string = mb_convert_encoding(
+                                      $string, $char_code, 'UTF-8');
+                },
+                $to_char_decode
+            );
+        }
+    }
+
 
 }
 
