@@ -105,7 +105,7 @@ class account_operations {
      * Retrieves list of accounts
      * @param boolean $all if set to true, list active and non-active accounts. when set to false, list only active UFs
      */
-    public function get_accounts_XML($all=0, $account_types='') {
+    public function get_accounts_XML($all=0, $account_types=array()) {
         $filter = $this->get_account_types_filter($account_types);
         // start XML
         $strXML = '';
@@ -275,6 +275,10 @@ class account_operations {
      *    * 2000 providers
      */
     protected function get_account_types_filter($account_types) {
+        // See BUG https://github.com/jmueller17/Aixada/issues/288#issuecomment-1019290362
+        // (this error could not be reproduced, but forcing cast to array does no harm)
+        $account_types = (array)$account_types;
+        
         $response = array(
             'show_uf' => false,
             'show_uf_generic' => false,
