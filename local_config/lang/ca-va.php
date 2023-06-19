@@ -1081,6 +1081,14 @@ $Text['os_reopen_order'] =
     Si es torna a obrir
     <b>cal parlar amb el proveïdor</b>
     per dir-li que la comanda ha estat cancel·lada!";
+    
+// Balances negatives
+$Text['negative_balance_disclaimer'] = 'Atenció, el teu crèdit és de ';
+$Text['negative_balance_advise'] = 'Re-carrega el moneder abans de poder fer més comandes.';
+$Text['negative_balance_ban_title'] = 'El teu moneder està en números vermells!';
+$Text['negative_balance_ban_subtitle'] = 'Fins que no carreguis el moneder, aquesta pàgina restarà bloquejada';
+$Text['negative_balance_image_alt'] = 'Pastanaga enfadada!';
+
 
 if (file_exists(__ROOT__.'local_config/lang_custom/ca-va.php')) {
 	include_once(__ROOT__.'local_config/lang_custom/ca-va.php');
