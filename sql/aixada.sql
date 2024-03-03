@@ -363,7 +363,8 @@ create table aixada_order_to_shop (
   revised			boolean 	default false,
   foreign key (order_id) references aixada_order(id),
   foreign key (product_id) references aixada_product(id),
-  foreign key (uf_id) references aixada_uf(id)
+  foreign key (uf_id) references aixada_uf(id),
+  index (order_item_id)
 ) engine=InnoDB default character set utf8 collate utf8_general_ci;
 
 
@@ -507,5 +508,15 @@ create table aixada_account_desc (
   description   varchar(50) not null,
   account_type  tinyint     default 1, -- 1:treasury, 2:service
   active        tinyint     default 1,
+  primary key (id)
+) engine=InnoDB default character set utf8 collate utf8_general_ci;
+
+/**
+ * Torns ufs
+ **/
+create table aixada_torns (
+  id            int(11) not null auto_increment,
+  dataTorn      date    not null,
+  ufTorn        int(11) not null,
   primary key (id)
 ) engine=InnoDB default character set utf8 collate utf8_general_ci;
