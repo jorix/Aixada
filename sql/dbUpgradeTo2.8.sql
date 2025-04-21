@@ -37,8 +37,11 @@ CREATE PROCEDURE dbUpdateUtil_removeRelatedFk(in the_table_name varchar(255)) BE
     end loop read_loop;
 END $$
 
-DROP PROCEDURE IF EXISTS dbUpdate_280_c02 $$
-CREATE PROCEDURE dbUpdate_280_c02() BEGIN
+/* =========================
+ * CREATE update procedure
+ * ========================= */
+DROP PROCEDURE IF EXISTS dbUpdate_280_c04 $$
+CREATE PROCEDURE dbUpdate_280_c04() BEGIN
 
 IF NOT EXISTS (
     SELECT * FROM information_schema.tables where table_schema=DATABASE() and table_name='aixada_version'
@@ -59,7 +62,7 @@ IF NOT EXISTS (
 END IF;
 
 insert into aixada_version (module_name, version) values (
-CONCAT('START dbUpdate_280_c02: ', SYSDATE()), '2.8'); 
+CONCAT('START dbUpdate_280_c04: ', SYSDATE()), '2.8'); 
 
 IF NOT EXISTS (
     SELECT * FROM information_schema.tables where table_schema=DATABASE() and table_name='aixada_stock_movement_type'
@@ -208,6 +211,9 @@ IF NOT EXISTS (
     '> CREATE table aixada_account_desc', '2.8');
 END IF;
 
+/* =========================
+ * v2.8.1
+ * ========================= */
 IF EXISTS (
     SELECT * FROM information_schema.columns
     WHERE table_schema = DATABASE()
@@ -231,6 +237,9 @@ IF EXISTS (
     '> CHANGE aixada_unit_measure.id from tinyint to smallint ', '2.8');
 END IF;
 
+/* =========================
+ * v2.8.2
+ * ========================= */
 IF NOT EXISTS (
     SELECT * FROM information_schema.columns WHERE table_schema = DATABASE()
         AND table_name ='aixada_order_item'
@@ -263,12 +272,51 @@ IF NOT EXISTS (
     '> ALTER aixada_provider ADD order_send_format and order_send_prices', '2.8');
 END IF;
 
+/* =========================
+ * v2.8.3
+ * ========================= */
+IF NOT EXISTS (
+    SELECT * FROM information_schema.columns WHERE table_schema=DATABASE()
+        AND table_name='aixada_order_to_shop' 
+        AND column_key <> ''
+        AND column_name = 'order_item_id'
+) THEN
+    ALTER TABLE aixada_order_to_shop add index (order_item_id);
+    insert into aixada_version (module_name, version) values (
+    '> ALTER TABLE aixada_order_to_shop add index (order_item_id)', '2.8.3');
+END IF;
+
+/* =========================
+ * v2.8.4
+ * ========================= */
+IF NOT EXISTS (
+    SELECT * FROM information_schema.tables where table_schema=DATABASE() and table_name='aixada_torns'
+) THEN
+
+    /**
+     * Types of stock movements such as stock corrected, loss, etc. 
+     */
+    create table aixada_torns (
+      id            int(11) not null auto_increment,
+      dataTorn      date    not null,
+      ufTorn        int(11) not null,
+      primary key (id)
+    ) engine=InnoDB default character set utf8 collate utf8_general_ci;
+    
+    insert into aixada_version (module_name, version) values (
+    '> CREATE table aixada_torns', '2.8.4');
+END IF;
+
+
+/* =========================
+ * Execute update procedure
+ * ========================= */
 insert into aixada_version (module_name, version) values (
-CONCAT('END dbUpdate_280_c02: ', SYSDATE()), '2.8'); 
+CONCAT('END dbUpdate_280_c04: ', SYSDATE()), '2.8'); 
 
 END $$
 
-CALL dbUpdate_280_c02() $$
+CALL dbUpdate_280_c04() $$
 
-DROP PROCEDURE IF EXISTS dbUpdate_280_c02 $$
+DROP PROCEDURE IF EXISTS dbUpdate_280_c04 $$
 DELIMITER ;

@@ -16,16 +16,16 @@ try{
         case 'getAccounts':
 	        printXML($ao->get_accounts_XML(
                 get_param_int('all', 0), 
-                get_param_array_int('account_types')
+                get_param_array_int('account_types', array())
             ));
             exit;
 
  		case 'getAllAccounts':
-	        printXML($ao->get_accounts_XML(1, array(1,2), 1, 1));
+	        printXML($ao->get_accounts_XML(1, array(1,2)));
 	        exit;
  		
 	    case 'getActiveAccounts':
-	        printXML($ao->get_accounts_XML(0, array(1,2), 1, 1));
+	        printXML($ao->get_accounts_XML(0, array(1,2)));
 	        exit;   
 	        
   		case 'accountExtract':
@@ -46,7 +46,7 @@ try{
 	    	
 	    case 'getBalances':
             printXML(
-				$ao->get_balances_XML(get_param_array_int('account_types'))
+				$ao->get_balances_XML(get_param_array_int('account_types', array()))
 			);
             exit;
 
@@ -56,6 +56,12 @@ try{
 					get_param_int('negative', 0)
 			));
 	    	exit;
+	    	
+	    case 'getUfNegativeBalance':
+	      printXML($ao->get_uf_negative_balance_XML(
+	        get_param_int('uf_id', -999)
+	     ));
+	     exit;
 			
 	   	case 'getNegativeAccounts':
 			printXML($ao->get_uf_balances_XML(0, 1));

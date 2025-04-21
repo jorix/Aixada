@@ -631,17 +631,6 @@
 		})
 			
 			
-		$('input[name=exportFormat]').on('click', function(){
-			if ($(this).attr("checked") == "checked" && $(this).val() == "gdrive"){
-				$('#export_authentication').fadeIn(1000);
-			} else {
-				$('#export_authentication').fadeOut(1000);
-			}
-
-		})
-		
-		$('#export_authentication').hide();
-
 		$('#export_ufs').hide();
 
 	
@@ -1266,7 +1255,7 @@
 	<!-- end of headwrap -->
 	
 	
-	<div id="stagewrap" class="ui-widget">
+	<div id="stagewrap" class="ui-widget <?= negative_balances_stagewrap_class() ?>">
 	
 		<div id="titlewrap">
 			<div id="titleLeftCol">

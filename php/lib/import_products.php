@@ -22,7 +22,7 @@ class import_products extends abstract_import_manager {
 	 * @param int $provider_id requires the id of an existing provider to which products pertain
 	 * @throws Exception
 	 */
-	public function __construct($data_table, $map=null, $provider_id){
+	public function __construct($data_table, $map=null, $provider_id=null){
 
 		$db = DBWrap::get_instance();
 	    $rs = $db->Execute('select id from aixada_provider where id=:1q', $provider_id);
@@ -72,7 +72,8 @@ class import_products extends abstract_import_manager {
             $rs = $db->Execute(
                 'SELECT id from aixada_product where active = 1'.
                 ' and provider_id = '.$this->provider_id.
-                ' and '.$this->_db_match_field.' not in ('.$match_col_list.')'
+                ' and ( '.$this->_db_match_field.' is null or 
+                    '.$this->_db_match_field.' not in ('.$match_col_list.') )'
             );
             while ($row = $rs->fetch_array()){
                 do_stored_query('change_active_status_product', 0, $row['id']);

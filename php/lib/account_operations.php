@@ -92,7 +92,7 @@ class account_operations {
                 where account_id between 2000 and 2999)");
         }
         if (count($sql) != 0) {
-            $sql2 = implode($sql, ' union ').
+            $sql2 = implode(' union ', $sql).
                                    " order by ts desc, id desc limit {$limit};";
             return $db->Execute($sql2);
         } else	{
@@ -105,7 +105,7 @@ class account_operations {
      * Retrieves list of accounts
      * @param boolean $all if set to true, list active and non-active accounts. when set to false, list only active UFs
      */
-    public function get_accounts_XML($all=0, $account_types) {
+    public function get_accounts_XML($all=0, $account_types=array()) {
         $filter = $this->get_account_types_filter($account_types);
         // start XML
         $strXML = '';
@@ -180,6 +180,66 @@ class account_operations {
 		}
 		return DBWrap::get_instance()->Execute($sql);
 	}
+	
+	/**
+	 *
+	 */
+	public function get_uf_negative_balance_XML($uf_id) {
+	  return rs_XML_fields(
+	    $this->get_uf_negative_balance_rs($uf_id),
+	    cnv_config_formats(array(
+	      'date' => 'timestamp',
+	      'balance' => 'amount'
+	    ))
+	  );
+  }
+  public function get_uf_negative_balance_rs($uf_id) {
+    $sql = "WITH balances (
+        account_id,
+        id,
+        balance,
+        ts,
+        rank
+    ) AS (SELECT
+        account_id,
+        id,
+        balance,
+        ts,
+        RANK() OVER (PARTITION BY account_id ORDER BY ts) AS rank
+    FROM aixada_account
+    WHERE account_id = {$uf_id} + 1e3)
+    SELECT
+        d.account_id,
+        u.id uf,
+        u.name,
+        b.balance,
+        d.ts date
+    FROM (SELECT
+            a.account_id,
+            a.id,
+            a.balance,
+            a.ts
+        FROM balances a
+        LEFT JOIN balances b
+        ON a.rank = b.rank + 1
+        WHERE a.balance < 0
+            AND b.balance >= 0
+        ORDER BY a.ts DESC
+        LIMIT 1) d -- dated
+    INNER JOIN (SELECT
+            account_id,
+            balance
+        FROM balances
+        WHERE account_id = {$uf_id} + 1e3
+        ORDER BY ts DESC
+        LIMIT 1) b -- balance
+     ON d.account_id = b.account_id
+     INNER JOIN aixada_uf u -- unitat familiar
+     ON b.account_id = u.id + 1e3
+     WHERE b.balance < 0;";
+    
+    return DBWrap::get_instance()->Execute($sql);
+  }
 		
 	/**
 	 *
@@ -266,7 +326,7 @@ class account_operations {
             ); 
         }
         return ( count($where_array) > 0 ? 
-                '( '.implode($where_array, ' or ').' )' : '1=0' );
+                '( '.implode(' or ', $where_array).' )' : '1=0' );
     }
     /**
      * There are five types: 
@@ -275,6 +335,10 @@ class account_operations {
      *    * 2000 providers
      */
     protected function get_account_types_filter($account_types) {
+        // See BUG https://github.com/jmueller17/Aixada/issues/288#issuecomment-1019290362
+        // (this error could not be reproduced, but forcing cast to array does no harm)
+        $account_types = (array)$account_types;
+        
         $response = array(
             'show_uf' => false,
             'show_uf_generic' => false,

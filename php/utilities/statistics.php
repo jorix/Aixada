@@ -4,7 +4,6 @@
 require_once(__ROOT__ . 'php/inc/database.php');
 require_once(__ROOT__ . 'php/utilities/general.php');
 require_once(__ROOT__ . 'local_config/config.php');
-//$firephp = FirePHP::getInstance(true);
 
 $max_ent = -1;
 $n_ent = -1;
@@ -140,7 +139,7 @@ function make_date_x($weeks_into_past, $stepsize)
     $arr_x = array();
     while($t < $now) {
         $t = strtotime($s . ' + ' . $m++ . ' month');
-        $arr_x[strftime('%d-%m-%Y', $t)] = $stepsize * ($t - $t0) / $c;
+        $arr_x[date('d-m-Y', $t)] = $stepsize * ($t - $t0) / $c;
     }
     return $arr_x; 
 }
@@ -182,7 +181,6 @@ function outlined_text($x, $y, $text, $color, $anchor)
 function make_active_time_lines($which, // 'uf', 'provider' or 'product'
                                 $weeks_into_past = 32)
 {
-    //    global $firephp;
     global $max_ent, $n_ent, $ordinal;
     $ordinal = array();
     $line = array();
@@ -394,7 +392,6 @@ function collect_balances_data()
 
 function make_balances()
 {
-    //    global $firephp;
     list($balance_of_uf, $date_of_week) = collect_balances_data();
     $line = array();
     $style = 'stroke-width:2';
