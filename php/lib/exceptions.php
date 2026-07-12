@@ -37,19 +37,6 @@ class InsufficientStockException extends Exception
  * @package Aixada
  * @subpackage Exceptions
  */ 
-class DateException extends Exception
-{
-  public function __construct($date)
-  {
-    parent::__construct();
-    $this->message = 'The date ' . $date . ' is not activated for ordering.';
-  }
-}
-
-/** 
- * @package Aixada
- * @subpackage Exceptions
- */ 
 class InternalException extends Exception {}
 
 /** 
