@@ -123,8 +123,9 @@ function get_field_options ($tm, $field)
   $editvalues = ''; 
   foreach ($tm->get_key_cache($field) as $val => $desc)
     $editvalues .= $val . ':' . $desc . ';';
-  $editvalues = rtrim($col_model, ";");
+  // PHPStan diagnostic: Undefined variable: $col_model
+  // No ha fallado por que la función get_field_options() no se usa en ningún sitio
+  // Ponenmos el nombre lógico 
+  $editvalues = rtrim($editvalues, ";");
   return $editvalues;
 }
-
-?>

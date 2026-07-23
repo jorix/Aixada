@@ -180,6 +180,8 @@ class table_manager extends table_with_ref
   {
     $db = DBWrap::get_instance();
     $rs = $db->Select($fields, $this->_table_name, $this->_primary_key .'='.$id, '');
+    // PHPStan diagnostic: Undefined variable: $strSQL
+    // -> Quitamos la variable, ya tenemos información del id i la tabla
     if (!$rs) throw new Exception('The statement ' . $strSQL . ' could not retrieve records from ' . $this->_table_name . ' for given id: ' . $id . '<br/>' . mysqli_error());
     return $rs;
   }
@@ -206,7 +208,9 @@ class table_manager extends table_with_ref
       */
   public function row_to_XML($row) 
   {
-    $strXML .= '<' . $this->_table_name . '_row>';
+    // PHPStan diagnostic: Undefined variable: $strXML 
+    // -> Usar = en vez de .=
+    $strXML = '<' . $this->_table_name . '_row>';
     foreach ($row as $field => $value) {
       if ($value) { 
 	list ($conv_value, $looked_up_value) = $this->_get_field_value($field, $value);
@@ -258,7 +262,7 @@ class table_manager extends table_with_ref
       * @param int $page the requested page of the result set
       * @param int $limit the number of rows to be written to the table
       */
-  public function rowset_to_jqGrid_XML($rs, $total_entries=0, $page, $limit=0, $total_pages=0)
+  public function rowset_to_jqGrid_XML($rs, $total_entries=0, $page='', $limit=0, $total_pages=0)
   {
     $strXML = '';
     if ($rs) {

@@ -85,7 +85,10 @@ class abstract_export_manager {
     {
     	//if no filename is given, construct one
     	if ($filename == ""){
-			$this->filename = "Export_" . $export_table . date('Y-m-d_h:i');    		
+    	    // PHPStan diagnostic: $export_table no está definida.
+    	    // -> usamos $this->export_table en vez de $export_table. 
+    	    //    En las clase derivadas no parece que nunca $filename==""
+			$this->filename = "Export_" . $this->export_table . date('Y-m-d_h:i');    		
     	} else {
 	  		$this->filename = $filename;        	   
     	}

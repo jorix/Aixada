@@ -204,7 +204,7 @@ function change_session_language($new_language_key) {
  * @throws Exception
  */
 function get_param($param_name, $default=null, $transform = '') {
-	$value; 
+	$value = ''; 
 
 	if (isset($_REQUEST[$param_name])) {
 		$value = $_REQUEST[$param_name];
@@ -810,6 +810,9 @@ function query_XML() //$strSQL, $group_tag, $row_tag, $param1=0, $param2=0)
   $strXML = "<$group_tag>";
   $rs = DBWrap::get_instance()->Execute($params);
   while ($row = $rs->fetch_array()) {
+      // PHPStan diagnostic: Undefined variable: $Text
+      // Missing declaration of: global $Text;
+      // Now it is not declared to avoid causing changes in the code's behavior.
       $value = ( ($row_tag == 'description' and isset($Text[$row[1]])) ? 
                  $Text[$row[1]] : $row[1] );
       $strXML 
@@ -851,6 +854,9 @@ function query_XML_noparam($queryname)
   while ($row = $rs->fetch_assoc()) {
   	 $strXML .= "<row>";
       foreach ($row as $field => $value) {
+          // PHPStan diagnostic: Undefined variable: $Text
+          // Missing declaration of: global $Text;
+          // Now it is not declared to avoid causing changes in the code's behavior.
           if ($field == 'description' and isset($Text[$value])) 
               $value = $Text[$value];
           $strXML .= "<{$field}>{$value}</{$field}>";

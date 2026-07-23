@@ -60,8 +60,9 @@ class DBWrap {
     if (mysqli_connect_errno())
       throw new InternalException('Unable to connect to database. ' . mysqli_connect_error());
     if (!$this->mysqli->set_charset("utf8"))
+        // PHPStan diagnostic: Undefined variable: $mysqli
         throw new InternalException('Unable to select charset utf8. Current character set: ' 
-                                    . $mysqli->character_set_name());
+                                    . $this->mysqli->character_set_name());
     /* ===========
      * Any changes here in `SQL_MODE` must also be applied to files in folder: 
      *  `/sql/queries`
@@ -425,7 +426,9 @@ commit;";
 	else $ct++;
 	$strSQL .= $this->mysqli->real_escape_string($field);
       }
-    } else throw new InternalException('Argument ' . $field . ' is neither string nor array');
+    // PHPStan diagnostic: Undefined variable: $field
+    // It is missing an 's', as this is an exception no error has been observed
+    } else throw new InternalException('Argument ' . $fields . ' is neither string nor array');
     
     $strSQL .= ' FROM ' . $the_table;
     if ($filter)
