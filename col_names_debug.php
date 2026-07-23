@@ -253,6 +253,12 @@ array (
     1 => 'name',
     2 => 'description',
   ),
+  'aixada_torns' => 
+  array (
+    0 => 'id',
+    1 => 'dataTorn',
+    2 => 'ufTorn',
+  ),
   'aixada_uf' => 
   array (
     0 => 'id',
