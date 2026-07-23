@@ -24,7 +24,13 @@ class table_col {
 	    $_max_length = false;
 	} else {
 	    $this->_type = strtok($type, '(');
-	    $this->_max_length = strtok(',)'); // this correctly parses "float(10,2)" -> 10 and "varchar(255) -> 255"
+	    // Error Warning: strtok(): Both arguments must be provided when starting tokenization 
+	    // -> Do not call a second time if the first call was false.
+        if ($this->_type) {
+            $this->_max_length = strtok(',)'); // this correctly parses "float(10,2)" -> 10 and "varchar(255) -> 255"
+        } else {
+            $this->_max_length = false;
+        }
 	}
     }
 
@@ -313,7 +319,11 @@ class foreign_key_manager {
 // 		} 
 	
       $cache[$row[$fIndex]] = $tmp_field_val;
-      $rcache[$row[$fDField]] = $row[$fIndex];
+      // La tabla 'aixada_cart' causa $row[$fDField]=null
+      // -> No creamos la $rcache si el indice es null
+      if (! is_null($row[$fDField])) { 
+        $rcache[$row[$fDField]] = $row[$fIndex];
+      }
     }
     $rs->free();
     $this->_key_cache[$key] = $cache;

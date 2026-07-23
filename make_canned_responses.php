@@ -82,57 +82,23 @@ EOD;
   fclose($handle);
 }
 
-function write_column_names($col_names)
+function make_column_names()
 {
-    file_put_contents('col_names.php', serialize($col_names));
-}
+    global $db;
 
-function make_canned_responses($language = 'en')
-{
-    $strPHP = <<<EOD
-class canned_table_manager {
-
-EOD;
-
-$tables = array();
-$col_names = array();
 $col_names_raw = array();
-$col_models = array();
-$active_fields = array();
-global $db;
-global $Text;
-$Text = '';
-require 'local_config/lang/' . $language . '.php';
 
 
 $rs = $db->Execute("SHOW TABLES LIKE 'aixada_%'");
 while ($row = $rs->fetch_array()) {
     $current_table = $row[0];
-    $tables[] = $current_table;
     $tm = new table_manager($current_table);
-    $col_names     [$current_table] = get_names($tm);
     $col_names_raw [$current_table] = array_keys($tm->get_table_cols());
-    $col_models    [$current_table] = get_model($tm);
-    $active_fields [$current_table] = get_active_field_names($tm);
 }
-write_column_names($col_names_raw);
-$strPHP .= print_response('col_names', $col_names);
-$strPHP .= print_response('col_model', $col_models);
-$strPHP .= print_response('active_fields', $active_fields);
 
-$strPHP .= <<<EOD
-
-  public function get_list_all_queries(\$table, \$page, \$limit)
-  {
-    return array("SELECT COUNT(*) AS count FROM \$table",
-		 "SELECT * FROM \$table ORDER BY active desc, id asc LIMIT \$page, \$limit");
-  }
+ return $col_names_raw;
 }
-?>
-EOD;
 
- return $strPHP;
-}
 
 function make_canned_queries()
 {
@@ -191,16 +157,15 @@ EOD;
   return $strSQL;
 }
 
-/*
-foreach (glob("local_config/lang/*.php") as $lang_file) {
-    $lang = basename($lang_file, '.php');
-    $handle = @fopen('canned_responses_' . $lang . '.php', "w");
-    fwrite($handle, "<?php\n");
-    fwrite($handle, make_canned_responses($lang));
-    fclose($handle);
-}
-*/
-make_canned_responses();
+
+$col_names = make_column_names();
+file_put_contents('col_names.php', serialize($col_names));
+write_file('col_names_debug.php', "
+// Function get_col_names() if for debugging purposes only.
+function get_col_names(){\nreturn\n" . 
+        var_export($col_names, true) .
+        "\n;\n}\n"
+);
 
 write_file('sql/queries/canned_queries.sql', make_canned_queries());
 
