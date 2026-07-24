@@ -106,11 +106,11 @@
 
 				// Reading the first row and checking if a specific separator character
 				// has more columns than others (it means that most likely that is the delimiter).
-				$SemicolonCount = count(fgetcsv($this -> Handle, null, $Semicolon));
+				$SemicolonCount = count(fgetcsv($this -> Handle, null, $Semicolon, "\"", "\\"));
 				fseek($this -> Handle, $this -> BOMLength);
-				$TabCount = count(fgetcsv($this -> Handle, null, $Tab));
+				$TabCount = count(fgetcsv($this -> Handle, null, $Tab, "\"", "\\"));
 				fseek($this -> Handle, $this -> BOMLength);
-				$CommaCount = count(fgetcsv($this -> Handle, null, $Comma));
+				$CommaCount = count(fgetcsv($this -> Handle, null, $Comma, "\"", "\\"));
 				fseek($this -> Handle, $this -> BOMLength);
 
 				$Delimiter = $Semicolon;
@@ -218,7 +218,7 @@
 			}
 
 			$this -> Index++;
-			$this -> CurrentRow = fgetcsv($this -> Handle, null, $this -> Options['Delimiter'], $this -> Options['Enclosure']);
+			$this -> CurrentRow = fgetcsv($this -> Handle, null, $this -> Options['Delimiter'], $this -> Options['Enclosure'], "\\");
 
 			if ($this -> CurrentRow)
 			{
