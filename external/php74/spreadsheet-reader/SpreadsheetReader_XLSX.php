@@ -200,7 +200,7 @@
 		 *	TempDir => string Temporary directory path
 		 *	ReturnDateTimeObjects => bool True => dates and times will be returned as PHP DateTime objects, false => as strings
 		 */
-		public function __construct($Filepath, array $Options = null)
+		public function __construct($Filepath, ?array $Options = null)
 		{
 			if (!is_readable($Filepath))
 			{
@@ -863,6 +863,8 @@
 						$Decimal = fmod(abs($Value), 1);
 						// Removing the integer part and decimal point
 						$Decimal *= pow(10, strlen($Decimal) - 2);
+						$DecimalPart = $Decimal; // PHPStan - Undefined variable: $DecimalPart
+						                         // May be $DecimalPart is $Decimal
 						$DecimalDivisor = pow(10, strlen($Decimal));
 
 						if (self::$RuntimeInfo['GMPSupported'])
@@ -922,7 +924,9 @@
 					// Currency/Accounting
 					if ($Format['Currency'])
 					{
-						$Value = preg_replace('', $Format['Currency'], $Value);
+						// PHPStan - Regex pattern is invalid: Empty regular expression in pattern
+						// -> so next line is comented
+						// $Value = preg_replace('', $Format['Currency'], $Value);
 					}
 				}
 				

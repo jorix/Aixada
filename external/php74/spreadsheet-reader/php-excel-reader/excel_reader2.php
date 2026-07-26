@@ -94,6 +94,21 @@ function v($data,$pos) {
 
 class OLERead {
 	var $data = '';
+
+     // Solving PHPStan error “Access to an undefined property”
+    private $error;
+    private $numBigBlockDepotBlocks;
+    private $sbdStartBlock;
+    private $rootStartBlock;
+    private $extensionBlock;
+    private $numExtensionBlocks;
+    private $bigBlockChain;
+    private $smallBlockChain;
+    private $entry;
+    private $props;
+    private $wrkbook;
+    private $rootentry;
+
 	function __construct(){	}
 
 	function read($sFileName){
@@ -316,6 +331,13 @@ class Spreadsheet_Excel_Reader {
 	var $colindexes = array();
 	var $standardColWidth = 0;
 	var $defaultColWidth = 0;
+
+    // Solving PHPStan error “Access to an undefined property”
+    private $store_extended_info;
+    private $_encoderFunction;
+    private $version;
+    private $nineteenFour;
+    private $sn;
 
 	function myHex($d) {
 		if ($d < 16) return "0" . dechex($d);

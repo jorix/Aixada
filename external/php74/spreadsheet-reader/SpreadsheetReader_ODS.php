@@ -36,6 +36,11 @@
 
 		private $TableOpen = false;
 		private $RowOpen = false;
+        
+        // Solving PHPStan error “Access to an undefined property”
+        private $TempDir;
+        private $Valid;
+        private $SheetReader;
 
 		/**
 		 * @param string Path to file
@@ -43,7 +48,7 @@
 		 *	TempDir => string Temporary directory path
 		 *	ReturnDateTimeObjects => bool True => dates and times will be returned as PHP DateTime objects, false => as strings
 		 */
-		public function __construct($Filepath, array $Options = null)
+		public function __construct($Filepath, ?array $Options = null)
 		{
 			if (!is_readable($Filepath))
 			{
