@@ -193,7 +193,12 @@
 
 		/** 
 		 * Move forward to next element. 
-		 * Similar to the next() function for arrays in PHP 
+		 * Similar to the next() function for arrays in PHP
+         *
+         * NOTA: ¿Por qué void?:
+         *       La interfaz nativa Iterator::next() en PHP está definida para no devolver nada (void)
+         *       A partir de PHP 8.1, esto genera una advertencia de deprecación (Deprecation Notice), 
+         *       y en PHP 9.0 se convertirá en un error fatal que romperá tu aplicación.
 		 */ 
 		public function next() : void
 		{

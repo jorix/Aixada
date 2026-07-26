@@ -94,6 +94,21 @@ function v($data,$pos) {
 
 class OLERead {
 	var $data = '';
+
+     // Solving PHPStan error “Access to an undefined property”
+    private $error;
+    private $numBigBlockDepotBlocks;
+    private $sbdStartBlock;
+    private $rootStartBlock;
+    private $extensionBlock;
+    private $numExtensionBlocks;
+    private $bigBlockChain;
+    private $smallBlockChain;
+    private $entry;
+    private $props;
+    private $wrkbook;
+    private $rootentry;
+
 	function __construct(){	}
 
 	function read($sFileName){
@@ -316,6 +331,13 @@ class Spreadsheet_Excel_Reader {
 	var $colindexes = array();
 	var $standardColWidth = 0;
 	var $defaultColWidth = 0;
+
+    // Solving PHPStan error “Access to an undefined property”
+    private $store_extended_info;
+    private $_encoderFunction;
+    private $version;
+    private $nineteenFour;
+    private $sn;
 
 	function myHex($d) {
 		if ($d < 16) return "0" . dechex($d);
@@ -542,7 +564,7 @@ class Spreadsheet_Excel_Reader {
 		}
 		return null;
 	}
-	function fontProperty($row,$col,$sheet=0,$prop) {
+	function fontProperty($row,$col,$sheet=0,$prop=null) {
 		$font = $this->fontRecord($row,$col,$sheet);
 		if ($font!=null) {
 			return $font[$prop];
@@ -861,6 +883,9 @@ class Spreadsheet_Excel_Reader {
 			$pattern = preg_replace($color_regex,"",$pattern);
 		}
 
+		// Localized currency symbol, e.g. [$£-6] or [$$-409] => keep just the symbol
+		$pattern = preg_replace("/\[\\\$([^\]-]*)(-[0-9A-Fa-f]+)?\]/", "$1", $pattern);
+
 		// In Excel formats, "_" is used to add spacing, which we can't do in HTML
 		$pattern = preg_replace("/_./","",$pattern);
 
@@ -924,7 +949,7 @@ class Spreadsheet_Excel_Reader {
 			$this->setOutputEncoding($outputEncoding);
 		}
 		for ($i=1; $i<245; $i++) {
-			$name = strtolower(( (($i-1)/26>=1)?chr(($i-1)/26+64):'') . chr(($i-1)%26+65));
+			$name = strtolower(( (($i-1)/26>=1)?chr(floor(($i-1)/26+64)):'') . chr(floor(($i-1)%26+65)));
 			$this->colnames[$name] = $i;
 			$this->colindexes[$i] = $name;
 		}
@@ -1122,7 +1147,13 @@ class Spreadsheet_Excel_Reader {
 								$spos += $len;
 							}
 						}
-						$retstr = ($asciiEncoding) ? $retstr : $this->_encodeUTF16($retstr);
+						if ($asciiEncoding) {
+							if ($this->_defaultEncoding) {
+								$retstr = mb_convert_encoding($retstr, $this->_defaultEncoding, 'ISO-8859-1');
+							}
+						} else {
+							$retstr = $this->_encodeUTF16($retstr);
+						}
 
 						if ($richString){
 							$spos += 4 * $formattingRuns;
@@ -1146,8 +1177,12 @@ class Spreadsheet_Excel_Reader {
 						$numchars = v($data,$pos+6);
 						if (ord($data[$pos+8]) == 0){
 							$formatString = substr($data, $pos+9, $numchars);
+							if ($this->_defaultEncoding) {
+								$formatString = mb_convert_encoding($formatString, $this->_defaultEncoding, 'ISO-8859-1');
+							}
 						} else {
 							$formatString = substr($data, $pos+9, $numchars*2);
+							$formatString = $this->_encodeUTF16($formatString);
 						}
 					} else {
 						$numchars = ord($data[$pos+6]);
@@ -1497,7 +1532,13 @@ class Spreadsheet_Excel_Reader {
 						$len = ($asciiEncoding)?$numChars : $numChars*2;
 						$retstr =substr($data, $xpos, $len);
 						$xpos += $len;
-						$retstr = ($asciiEncoding)? $retstr : $this->_encodeUTF16($retstr);
+						if ($asciiEncoding) {
+							if ($this->_defaultEncoding) {
+								$retstr = mb_convert_encoding($retstr, $this->_defaultEncoding, 'ISO-8859-1');
+					}
+						} else {
+							$retstr = $this->_encodeUTF16($retstr);
+						}
 					}
 					elseif ($version == SPREADSHEET_EXCEL_READER_BIFF7){
 						// Simple byte string

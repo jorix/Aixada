@@ -115,7 +115,7 @@
 			11 => '0.00E+00',
 			12 => '# ?/?',
 			13 => '# ??/??',
-			14 => 'mm-dd-yy',
+			14 => 'mm/dd/yyyy',
 			15 => 'd-mmm-yy',
 			16 => 'd-mmm',
 			17 => 'mmm-yy',
@@ -123,7 +123,7 @@
 			19 => 'h:mm:ss AM/PM',
 			20 => 'h:mm',
 			21 => 'h:mm:ss',
-			22 => 'm/d/yy h:mm',
+			22 => 'd/m/yyyy h:mm',
 
 			37 => '#,##0 ;(#,##0)',
 			38 => '#,##0 ;[Red](#,##0)',
@@ -734,6 +734,20 @@
 					$Format['Code'] = preg_replace("{\\\\}", '', $Format['Code']);
 					// Removing string quotes
 					$Format['Code'] = str_replace(array('"', '*'), '', $Format['Code']);
+
+					// Localized currency symbol, e.g. [$£-809] or [$$-409] => keep just the symbol
+					$Matches = array();
+					if (preg_match('{\[\$([^\]-]*)(-[0-9A-Za-z]*)?\]}u', $Format['Code'], $Matches))
+					{
+						$CurrCode = $Matches[1];
+						if (!$CurrCode)
+						{
+							$CurrCode = self::$CurrencyCode;
+						}
+						$Format['Currency'] = $CurrCode;
+						$Format['Code'] = preg_replace('{\[\$([^\]-]*)(-[0-9A-Za-z]*)?\]}u', $CurrCode, $Format['Code']);
+					}
+
 					// Removing thousands separator
 					if (strpos($Format['Code'], '0,0') !== false || strpos($Format['Code'], '#,#') !== false)
 					{
@@ -775,24 +789,6 @@
 						}
 					}
 
-					$Matches = array();
-					if (preg_match('{\[\$(.*)\]}u', $Format['Code'], $Matches))
-					{
-						$CurrFormat = $Matches[0];
-						$CurrCode = $Matches[1];
-						$CurrCode = explode('-', $CurrCode);
-						if ($CurrCode)
-						{
-							$CurrCode = $CurrCode[0];
-						}
-
-						if (!$CurrCode)
-						{
-							$CurrCode = self::$CurrencyCode;
-						}
-
-						$Format['Currency'] = $CurrCode;
-					}
 					$Format['Code'] = trim($Format['Code']);
 				}
 
@@ -863,6 +859,8 @@
 						$Decimal = fmod(abs($Value), 1);
 						// Removing the integer part and decimal point
 						$Decimal *= pow(10, strlen($Decimal) - 2);
+						$DecimalPart = $Decimal; // PHPStan - Undefined variable: $DecimalPart
+						                         // May be $DecimalPart is $Decimal
 						$DecimalDivisor = pow(10, strlen($Decimal));
 
 						if (self::$RuntimeInfo['GMPSupported'])
@@ -915,14 +913,8 @@
 								$Value = sprintf($Format['Pattern'], $Value);
 							}
 
-							$Value = preg_replace('{(0+)(\.?)(0*)}', $Value, $Format['Code']);
+							$Value = preg_replace('{(0+)(\.?)(0*)}', $Value, $Format['Code'], 1);
 						}
-					}
-
-					// Currency/Accounting
-					if ($Format['Currency'])
-					{
-						$Value = preg_replace('', $Format['Currency'], $Value);
 					}
 				}
 				
@@ -998,8 +990,6 @@
 		 */ 
 		public function next()
 		{
-			$this -> Index++;
-
 			$this -> CurrentRow = array();
 
 			if (!$this -> RowOpen)
@@ -1008,6 +998,13 @@
 				{
 					if ($this -> Worksheet -> name == 'row')
 					{
+						// The row number as declared in the file is the real
+						// source of truth for the key(), so empty/skipped rows
+						// are represented correctly instead of just counting
+						// how many <row> elements have been read so far.
+						$RowNumber = $this -> Worksheet -> getAttribute('r');
+						$this -> Index = ($RowNumber !== null && $RowNumber !== '') ? (int)$RowNumber : $this -> Index + 1;
+
 						// Getting the row spanning area (stored as e.g., 1:12)
 						// so that the last cells will be present, even if empty
 						$RowSpans = $this -> Worksheet -> getAttribute('spans');
@@ -1026,7 +1023,10 @@
 							$this -> CurrentRow = array_fill(0, $CurrentRowColumnCount, '');
 						}
 
-						$this -> RowOpen = true;
+						// A self-closing <row/> (used for completely empty rows)
+						// has no separate closing tag to read later, so there's
+						// nothing more to consume for this row.
+						$this -> RowOpen = !$this -> Worksheet -> isEmptyElement;
 						break;
 					}
 				}
@@ -1133,8 +1133,6 @@
 					ksort($this -> CurrentRow);
 				}
 			}
-
-			return $this -> CurrentRow;
 		}
 
 		/** 

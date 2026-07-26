@@ -883,6 +883,9 @@ class Spreadsheet_Excel_Reader {
 			$pattern = preg_replace($color_regex,"",$pattern);
 		}
 
+		// Localized currency symbol, e.g. [$£-6] or [$$-409] => keep just the symbol
+		$pattern = preg_replace("/\[\\\$([^\]-]*)(-[0-9A-Fa-f]+)?\]/", "$1", $pattern);
+
 		// In Excel formats, "_" is used to add spacing, which we can't do in HTML
 		$pattern = preg_replace("/_./","",$pattern);
 
@@ -1144,7 +1147,13 @@ class Spreadsheet_Excel_Reader {
 								$spos += $len;
 							}
 						}
-						$retstr = ($asciiEncoding) ? $retstr : $this->_encodeUTF16($retstr);
+						if ($asciiEncoding) {
+							if ($this->_defaultEncoding) {
+								$retstr = mb_convert_encoding($retstr, $this->_defaultEncoding, 'ISO-8859-1');
+							}
+						} else {
+							$retstr = $this->_encodeUTF16($retstr);
+						}
 
 						if ($richString){
 							$spos += 4 * $formattingRuns;
@@ -1168,8 +1177,12 @@ class Spreadsheet_Excel_Reader {
 						$numchars = v($data,$pos+6);
 						if (ord($data[$pos+8]) == 0){
 							$formatString = substr($data, $pos+9, $numchars);
+							if ($this->_defaultEncoding) {
+								$formatString = mb_convert_encoding($formatString, $this->_defaultEncoding, 'ISO-8859-1');
+							}
 						} else {
 							$formatString = substr($data, $pos+9, $numchars*2);
+							$formatString = $this->_encodeUTF16($formatString);
 						}
 					} else {
 						$numchars = ord($data[$pos+6]);
@@ -1519,7 +1532,13 @@ class Spreadsheet_Excel_Reader {
 						$len = ($asciiEncoding)?$numChars : $numChars*2;
 						$retstr =substr($data, $xpos, $len);
 						$xpos += $len;
-						$retstr = ($asciiEncoding)? $retstr : $this->_encodeUTF16($retstr);
+						if ($asciiEncoding) {
+							if ($this->_defaultEncoding) {
+								$retstr = mb_convert_encoding($retstr, $this->_defaultEncoding, 'ISO-8859-1');
+							}
+						} else {
+							$retstr = $this->_encodeUTF16($retstr);
+						}
 					}
 					elseif ($version == SPREADSHEET_EXCEL_READER_BIFF7){
 						// Simple byte string
