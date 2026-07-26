@@ -38,6 +38,7 @@ class DBWrap {
    * @var string stores the last query string sent to the SQL engine
    */
   public $last_query_SQL = '';
+  public $current_query_SQL = '';
 
   /**
    * @var string stores the next-to-last query string sent to the SQL engine
@@ -150,6 +151,22 @@ class DBWrap {
       }
   }
 
+    /**
+     * Obtiene el último error de MySQL de forma segura para PHP 8.5
+     * 
+     * @return string
+     */
+    public function get_error()
+    {
+        // PHP 8.5 exige estrictamente que mysqli_error reciba el objeto de conexión.
+        // Además, validamos que la propiedad exista y sea una instancia válida de mysqli.
+        if (isset($this->mysqli) && $this->mysqli instanceof mysqli) {
+            return mysqli_error($this->mysqli);
+        }
+        // Si la conexión no se ha iniciado o falló antes de crearse, usamos mysqli_connect_error
+        return mysqli_connect_error() ?: 'Error desconocido o conexión no inicializada';
+    }
+
   /**
    * Executes an SQL query.
    *
@@ -161,6 +178,7 @@ class DBWrap {
    */
   private function do_Execute($safe_sql_string, $multi = false)
   {
+    $this->current_query_SQL = $safe_sql_string;
     $rs = ($multi ? 
 	   $this->mysqli->multi_query($safe_sql_string) :
 	   $this->mysqli->query($safe_sql_string));
@@ -468,4 +486,3 @@ commit;";
   }
 }
 
-?>

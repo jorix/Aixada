@@ -64,5 +64,3 @@ class XMLParseException extends Exception {
 	    . ' in ' . $xml;
     }
 }
-
-?>

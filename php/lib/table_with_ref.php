@@ -308,7 +308,7 @@ class foreign_key_manager {
   {
     $db = DBWrap::get_instance();
     $rs = $db->Select(array($fDField, $fIndex), $fTable, '', '');
-    if (!$rs) throw new Exception("Could not read foreign key descriptions from table $fTable using $strSQL . Error: " . mysqli_error());
+    if (!$rs) throw new Exception("Could not read foreign key descriptions from table $fTable using {$db->current_query_SQL}. Error: " . $db->get_error());
     //    if (!mysqli_num_rows($rs)) throw new Exception('No foreign keys found in table ' . $fTable);
     $cache = array();
     $rcache = array();

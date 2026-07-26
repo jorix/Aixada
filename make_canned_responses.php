@@ -41,7 +41,12 @@ EOD;
 EOD;
  return $strPHP;
 }
-
+// PHPStan diagnostic: Access to an undefined property table_manager::$_primary_index.
+// -> La función get_list_all_query() no se usa
+//    -> Llama a do_list_all() de .\php\utilities\tables.php que solo de usa en get_list_all_query()
+//       -> Llama a list_all() de \php\lib\table_manager.php que solo de usa en do_list_all()
+//          -> Usa la propiedad no definida $this->_primary_index 
+// -> Se mantiene el codigo ya que no va a afectar a la ejecución que la propiedad no esté definida.
 function get_list_all_query ($tm)
 {
   global $db;

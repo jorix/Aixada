@@ -523,6 +523,10 @@ function send_mail($to, $subject, $bodyHTML, $options=array())
             // Send using swiftmailer
             require_once __ROOT__ . 'external/php53_2/swiftmailer-5.x/lib/swift_required.php';
             require_once __ROOT__ . 'php/utilities/send_swiftmail.php';
+            // PHPStan diagnostic: Function send_swiftmail not found
+            // -> Es correcto! El código 'php/utilities/send_swiftmail.php' que
+            //     contiene la función se ignora en el analisis ya que es para < 7.4
+            // @phpstan-ignore function.notFound
             return send_swiftmail($from, $reply_to, $to, $subject, $messageHTML, $options);
         }
     }
@@ -814,6 +818,7 @@ function query_XML() //$strSQL, $group_tag, $row_tag, $param1=0, $param2=0)
       // Missing declaration of: global $Text;
       // Now it is not declared to avoid causing changes in the code's behavior.
       $value = ( ($row_tag == 'description' and isset($Text[$row[1]])) ? 
+      // @phpstan-ignore variable.undefined
                  $Text[$row[1]] : $row[1] );
       $strXML 
           .= '<row><id f="id">' . $row[0] 
@@ -858,6 +863,7 @@ function query_XML_noparam($queryname)
           // Missing declaration of: global $Text;
           // Now it is not declared to avoid causing changes in the code's behavior.
           if ($field == 'description' and isset($Text[$value])) 
+          // @phpstan-ignore variable.undefined
               $value = $Text[$value];
           $strXML .= "<{$field}>{$value}</{$field}>";
       }
@@ -1099,5 +1105,3 @@ function clean_zeros($value)
 	  rtrim(rtrim($value, '0'), '.') 
 	  : $value);
 }
-
-?>

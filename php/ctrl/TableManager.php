@@ -10,19 +10,23 @@ require_once(__ROOT__ . "php/utilities/general.php");
 require_once(__ROOT__ . 'local_config/lang/' . get_session_language() . '.php');
 require_once(__ROOT__ . "php/utilities/tables.php");
 
-function get_columns_as_JSON()
-{
-  global $special_table;
-  global $Text;
-  $Text = array();
-  require(__ROOT__ . 'canned_responses_' . get_session_language() . '.php');
-  $ctm = new canned_table_manager();
-  $table = $_REQUEST['table'];
-  return '{"col_names":"' . $ctm->get_col_names_as_JSON($table)
-    . '","col_model":"' . $ctm->get_col_model_as_JSON($table)
-    . '","active_fields":"' . $ctm->get_active_fields_as_JSON($table)
-    . '"}';
-}
+  // PHPStan diagnostic: Instantiated class canned_table_manager not found
+  // -> No se usa 'getColumnsAsJSON' 
+  //    -> get_columns_as_JSON() quitamos la llamada
+  //       -> Se quita la función que instanciaba la clase canned_table_manager() 
+// function get_columns_as_JSON()
+// {
+  // global $special_table;
+  // global $Text;
+  // $Text = array();
+  // require(__ROOT__ . 'canned_responses_' . get_session_language() . '.php');
+  // $ctm = new canned_table_manager();
+  // $table = $_REQUEST['table'];
+  // return '{"col_names":"' . $ctm->get_col_names_as_JSON($table)
+    // . '","col_model":"' . $ctm->get_col_model_as_JSON($table)
+    // . '","active_fields":"' . $ctm->get_active_fields_as_JSON($table)
+    // . '"}';
+// }
 
 function get_options()
 {    
@@ -145,9 +149,13 @@ try{
     throw new Exception("ctrlTableManager: variable oper not set in query");
 
   switch($_REQUEST['oper']) {
-  case 'getColumnsAsJSON':
-      echo get_columns_as_JSON();
-      exit;
+  // PHPStan diagnostic: Instantiated class canned_table_manager not found
+  // -> No se usa 'getColumnsAsJSON' 
+  //    -> get_columns_as_JSON() quitamos la llamada
+  //       -> Se quita la función que instanciaba la clase canned_table_manager() 
+  // case 'getColumnsAsJSON':
+      // echo get_columns_as_JSON();
+      // exit;
 
   case 'listAll':
     printXML(get_list_all_XML());
