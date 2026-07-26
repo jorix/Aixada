@@ -1,5 +1,12 @@
 <?php
-// ./vendor/bin/phpunit test/PHPUnit_aixada_tests.php --testdox
+if (version_compare(PHP_VERSION, '8.0.0') < 0) {
+    // En la consola (CLI) de PHP 7.4 suele tener un buffer de 0 esto proboca
+    // que cuando aixada lanza `session_start();` PHPUnit 9 de el error:
+    // - Cannot start session when headers already sent.
+    // -> Arancamos la sesión antes que lo haga Aixada si estamos con PHP 7.4
+    session_start();
+}
+
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\TestDox;
 
@@ -8,15 +15,15 @@ class PHPUnit_aixada_tests extends TestCase
 {
 
     #[TestDox('Comprobar importación de hojas de cálculo con ./external/php74/spreadsheet-reader')]
-    public function test_spreadsheet_reader(): void
-    {
+    public function test_comprobar_importacion_de_hojas_de_calculo(): void
+    {  
         $base_folder = dirname(dirname(__FILE__)) . '/';
         require_once $base_folder . 'external/php74/spreadsheet-reader/SpreadsheetReader.php';
         require_once $base_folder . 'external/php74/spreadsheet-reader/php-excel-reader/excel_reader2.php';
         require_once 'test-spreadsheet-reader/sheet_import.php';
-        function i_sheet_import($file_path) {
+        $i_sheet_import = function ($file_path) {
             return sheet_import('test/test-spreadsheet-reader/test_files/' . $file_path);
-        }
+        };
 
         $from_excel = [ 'Hoja1' => [
                 1 => [ 0 => '1 to 9', 1 => 123456789.0, ],
@@ -67,22 +74,22 @@ class PHPUnit_aixada_tests extends TestCase
             15 => [ 4 => 'E16', ], ];
 
         // Provamos los distintos archivos
-        $this->assertEquals(['sheet.csv' => $from_csv_sheet ], i_sheet_import('sheet.csv'));
+        $this->assertEquals(['sheet.csv' => $from_csv_sheet ], $i_sheet_import('sheet.csv'));
 
-        $this->assertEquals(['sheet.tsv' => $from_csv_sheet ], i_sheet_import('sheet.tsv'));
+        $this->assertEquals(['sheet.tsv' => $from_csv_sheet ], $i_sheet_import('sheet.tsv'));
 
-        $this->assertEquals($from_ods, i_sheet_import('sheet.ods'));
+        $this->assertEquals($from_ods, $i_sheet_import('sheet.ods'));
 
-        $this->assertEquals($from_excel, i_sheet_import('sheet.xls'));
+        $this->assertEquals($from_excel, $i_sheet_import('sheet.xls'));
 
-        $this->assertEquals($from_excel, i_sheet_import('sheet.xlsx'));
+        $this->assertEquals($from_excel, $i_sheet_import('sheet.xlsx'));
 
     }
 
 // =============================================
 
     #[TestDox('Comprobar función DBWrap->get_error() de ./php/inc/database.php')]
-    public function test_db_get_error(): void
+    public function test_comprobar_funcion_get_error_de_DBWrap(): void
     {
         // Instanciamos la db de Aixada
         $db_aixada = $this->get_db();
@@ -96,18 +103,21 @@ class PHPUnit_aixada_tests extends TestCase
         $errorMsg = $db_aixada->get_error();
         $this->assertEmpty($errorMsg);
 
+        $error_occurred = false;
         try {
             $rs = $db_aixada->Execute('SELECT id FROM aixada_userr where id=1;');
         } catch (Exception $e) {
+            $error_occurred = true;
             $errorMsg = $db_aixada->get_error();
             // error_log('$errorMsg ="' . $errorMsg . '"');
             $this->assertNotEmpty($errorMsg);
-            $this->assertEquals($e->getMessage(), $errorMsg);
+            $this->assertEquals("Table 'lacistella2.aixada_userr' doesn't exist", $errorMsg);
         }
+        $this->assertEquals(true, $error_occurred);
     }
 
     #[TestDox('Comprobar valor DBWrap->current_query_SQL de ./php/inc/database.php vía ./php/lib/table_with_ref.php')]
-    public function test_foreign_key_manager(): void
+    public function test_comprobar_valor_de_current_query_SQL_en_DBWrap(): void
     {
         // Instanciamos la db de Aixada
         $db_aixada = $this->get_db();
@@ -116,12 +126,16 @@ class PHPUnit_aixada_tests extends TestCase
 
         $fkm = new foreign_key_manager("aixada_version");
         $this->assertEquals('SELECT * FROM aixada_version LIMIT 1', $db_aixada->current_query_SQL);
+
+        $error_occurred = false;
         try {
             $fkm = new foreign_key_manager("aixada_userr");
         } catch (Exception $e) {
+            $error_occurred = true;
             // error_log('$db_aixada->current_query_SQL ="' . $db_aixada->current_query_SQL . '"');
             $this->assertEquals('SHOW CREATE TABLE aixada_userr', $db_aixada->current_query_SQL);
         }
+        $this->assertEquals(true, $error_occurred);
     }
     
     /* -----------------------
@@ -153,5 +167,4 @@ class PHPUnit_aixada_tests extends TestCase
 
         return $db;
     }
-
 }
