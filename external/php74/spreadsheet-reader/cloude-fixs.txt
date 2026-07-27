@@ -1,0 +1,36 @@
+>Uso l'eina spreadsheet-reader per importar excels en PHP. 
+>Te un problema al importar de xls en els imports amb simlbols de moneda.
+>Sempre ha fallat i no me n'havia preocupat, ara he pensat veure si la IA ho troba...
+>Et pujo un lot de 4 php i un xls que permet veure el problema.
+
+El bug
+
+El fitxer sheet.xls té formats de número personalitzats amb símbols de moneda (€, £) que Excel guarda com a text UTF-16LE dins del registre FORMAT del fitxer binari XLS.
+
+(3 bugs relacionats, tots amb el mateix origen: conversió d'encoding incompleta):
+
+1. Format personalitzats de moneda (el bug principal)
+Els registres FORMAT (format numèrics personalitzats, com els que fan servir el símbol €) es llegien com a UTF-16LE però mai es convertien a UTF-8 — a diferència del que ja es feia per als noms de font o de full. Resultat: bytes nuls barrejats amb els dígits (5\x00\x005\x005...) en lloc de 5,43 €.
+
+2. Text amb accents / cadenes "comprimides"
+El mateix problema de fons afectava qualsevol cel·la de text que Excel guarda en mode "comprimit" (1 byte/caràcter, és a dir Latin-1): namés es convertien les cadenes Unicode (2 bytes/caràcter), les comprimides es deixaven crues. Per això paraules com "àèìòù" sortien corruptes i trencaven tot el var_dump (UTF-8 invàlid).
+
+3. Símbols de moneda localitzats (£, $)
+Un tercer bug, no d'encoding sinó de parsing: els codis de format d'Excel del tipus [$£-6] (símbol + codi d'idioma) no es interpretaven, i el codi sencer quedava literalment enganxat davant del número ([$£-6]6 en lloc de £6.00).
+
+- - - - -- -
+
+>xlsx Té dos problemes: 
+> - No presenta be ni lliures ni dollars, posa: '[$£-85.549]5.54'
+> - I diu 'Hoja2' => [ 0 => [ 1 => 'B2',], ] el 0 indica que s'ha menjat una fila buida
+>Afegeixo el xlsx i un php mes que s'usa per xlsx
+
+1. Moneda (£ i $)
+El codi de format `[£-809]#,##0.00` no s'interpretava: el bloc `[ ...]` sencer quedava literalment dins la plantilla, i la substitució final del número (preg_replace sense límit) reemplaçava tots els grups de zeros que trobava — incloent el "0" amagat dins del codi de país "809" — produint el disbarat `[
+£−85.549]5.54 ‘.𝐴𝑟𝑎𝑠′𝑒𝑥𝑡𝑟𝑒𝑢𝑛𝑜𝑚𝑒ˊ𝑠𝑒𝑙𝑠ıˊ𝑚𝑏𝑜𝑙(‘£‘,‘`) Ara s'extreu només el símbol (£, $) abans de processar la resta, i la substitució es limita a la primera coincidència.
+
+2. "Es menja una fila" — el més subtil
+Quan una fila és totalment buida, Excel la desa com a etiqueta autotancada <row r="1"/> (sense tancament separat </row>). El lector esperava sempre un tancament separat, així que en trobar-ne una absent, continuava llegint... i s'enganxava directament amb l'obertura de la fila següent, fusionant totes dues en una sola. Per això veies B2 penjat de la clau 0 en lloc de 2.
+
+3. Índex de fila com a simple comptador
+El key() retornava un comptador intern (Index++) en lloc del número real de fila del fitxer (atribut r), i a sobre hi havia un Index-- compensatori mal calculat que desplaçava totes les claus una posició. Ara key() reflecteix el número real de fila, igual que ja feia el lector .xls.
