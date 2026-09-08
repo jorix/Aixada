@@ -50,9 +50,38 @@ class PHPUnit_aixada_tests extends TestCase
         $base_folder = dirname(dirname(__FILE__)) . '/';
         require_once $base_folder . 'external/php74/spreadsheet-reader/SpreadsheetReader.php';
         require_once $base_folder . 'external/php74/spreadsheet-reader/php-excel-reader/excel_reader2.php';
-        require_once 'test-spreadsheet-reader/sheet_import.php';
-        $i_sheet_import = function ($file_path) {
-            return sheet_import('test/test-spreadsheet-reader/test_files/' . $file_path);
+        
+        $i_sheet_import = function ($file_name) {
+            $file_path = 'test/test-spreadsheet-files/' . $file_name;
+            try {
+                
+                $Spreadsheet = new SpreadsheetReader($file_path);
+
+                $Sheets = $Spreadsheet -> Sheets();
+                $v_shets = [];
+                foreach ($Sheets as $Index => $Name) {
+                    $v_shet = [];
+                    $Spreadsheet -> ChangeSheet($Index);
+                    foreach ($Spreadsheet as $Key => $Row) {
+                        $v_row = [];
+                        foreach($Row as $k => $v) {
+                            if ($v !== '') {
+                                $v_row[$k]=$v;
+                            }
+                        }
+                        if (count($v_row) > 0) {
+                            $v_shet[$Key]=$v_row;
+                        }
+                    }
+                    if (count($v_shet) > 0) {
+                        $v_shets[$Name]=$v_shet;
+                    }
+                }
+                return $v_shets;
+            } catch (Exception $e) {
+                error_log($e->getMessage());
+                return [ $e->getMessage() ];
+            }
         };
 
         $from_excel = [ 'Hoja1' => [
