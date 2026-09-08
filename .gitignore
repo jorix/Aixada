@@ -7,3 +7,4 @@ vendor_t74
 /composer_t85.lock
 /composer_t74.lock
 /test/logs
+/.phpunit.result.cache

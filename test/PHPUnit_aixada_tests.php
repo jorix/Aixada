@@ -26,12 +26,25 @@ $_SERVER = [
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\Depends;
+
+/**
+ * =============================================================================
+ * El juego de pruebas está preparado para que funcione con:
+ *      - PHP 7.4 con PHPUnit 9.6.35
+ * y con:
+ *      - PHP 8.5 con PHPUnit 13.2.6
+ * =============================================================================
+ */      
 
 #[TestDox('Comprobar algunas partes del código de Aixada con PHPUnit')]
 class PHPUnit_aixada_tests extends TestCase
 {
+    //———————————————————————————— Hojas de cálculo ————————————————————————————
 
-    #[TestDox('Comprobar importación de hojas de cálculo con ./external/php74/spreadsheet-reader')]
+    #[Test]
+    #[TestDox('Comprobar importación de hojas de cálculo con PHP >= 7.4 ./external/php74/spreadsheet-reader')]
     public function test_comprobar_importacion_de_hojas_de_calculo(): void
     {  
         $base_folder = dirname(dirname(__FILE__)) . '/';
@@ -103,15 +116,23 @@ class PHPUnit_aixada_tests extends TestCase
 
     }
 
-    #[TestDox('Comprovar el envio de correos')]
-    public function test_enviar_un_email(): void
+    //——————————————————————————————— Correo ———————————————————————————————————
+    // - Como servidor de SMTP local de pruevas se debe ejecutar
+    //      [mailpit](https://mailpit.axllent.org/) desde linia de mandatos del
+    //      sistema.
+    // - Para acceder al SMTP:  http://localhost:1025
+    // - Para ver correos:      http://localhost:8025
+
+    #[Test]
+    #[TestDox('Comprobar el envio de correos')]
+    public function test_enviar_un_email(): string
     {
-        // Como servidor de smtp de pruevas se usa en local: mailpit.axllent.org
-        // See mails at: http://localhost:8025
+        $date = new DateTime();
+        $email_sent_on = "=>" . $date->format('Y-m-d H:i:s.u') . "<= ";
         
         $this->define_root();
         require_once __ROOT__ . "php/utilities/general.php";
-        put_config([
+        $this->put_config([
             'admin_email' => 'no_es@nesesario.es',
             'email_SMTP_pswd' => 'no_nesesario',
             'admin_email' => "test@dummy_origin.com",
@@ -128,9 +149,10 @@ class PHPUnit_aixada_tests extends TestCase
             'bcc' => 'and-another-user@dummy_destination.com'
         ];
 
-        global $Text;
         $testUTF = 'áàéèïíoóòüúçñ ÁÀÉÈÏÍOÓÒÜÚÇÑ €=EUR';
-        $subject = "IT'S A TEST: ". $testUTF . "<br>";
+
+        $subject = $email_sent_on . "IT'S A TEST: ". $testUTF;
+
         $messageHTML = "<b>Is a test using PHP v." . PHP_VERSION . "</b><br>
             Test utf-8: " . $testUTF . "<br><br>
             Options:<br><pre style='margin: 0 0 0 3em'>" . 
@@ -150,9 +172,39 @@ class PHPUnit_aixada_tests extends TestCase
         $email_was_sent = send_mail($toEmail, $subject, $messageHTML, $options);
         ob_end_flush();
         $this->assertEquals(true, $email_was_sent);
-    }
-// =============================================
 
+        return $email_sent_on;
+    }
+
+    #[Test]
+    #[TestDox('Comprobar la recepción de un correo')]
+    /**
+     * @depends test_enviar_un_email
+     */
+    #[Depends('test_enviar_un_email')]
+    public function test_recepcion_del_email(string $email_sent_on): void
+    {
+        $json = @file_get_contents('http://localhost:8025/api/v1/messages');
+
+        if ($json === false) {
+            throw new RuntimeException('No se puede conectar com Mailpit.');
+        }
+        $data = json_decode($json, true);
+
+        $found = false;
+        foreach ($data['messages'] as $k => $m) {
+            // Se usa str_contains() ya que Aixada pone un prefijo con nombre coop
+            if ( str_contains($m['Subject'],$email_sent_on) ) {
+                $found = true;
+                break;
+            }
+        }
+        $this->assertTrue($found, 'Se ha recivido correctamente el correo.');
+    }
+
+    //————————————————————————————————— Aixada —————————————————————————————————
+
+    #[Test]
     #[TestDox('Comprobar función DBWrap->get_error() de ./php/inc/database.php')]
     public function test_comprobar_funcion_get_error_de_DBWrap(): void
     {
@@ -181,6 +233,7 @@ class PHPUnit_aixada_tests extends TestCase
         $this->assertEquals(true, $error_occurred);
     }
 
+    #[Test]
     #[TestDox('Comprobar valor DBWrap->current_query_SQL de ./php/inc/database.php vía ./php/lib/table_with_ref.php')]
     public function test_comprobar_valor_de_current_query_SQL_en_DBWrap(): void
     {
@@ -202,11 +255,10 @@ class PHPUnit_aixada_tests extends TestCase
         }
         $this->assertEquals(true, $error_occurred);
     }
-    
-    /* -----------------------
-     * Para abrir la base de datos y mantener una buena gestión output buffers.
-     * -----------------------
-     */
+
+    //———————————————— Funciones internas para los test —————————————————————————
+
+    // Definir __ROOT__ y DS tal como lo hace Aixada
     private function define_root()
     {
         if(! defined('__ROOT__')) {
@@ -217,6 +269,8 @@ class PHPUnit_aixada_tests extends TestCase
             define('__ROOT__', $f_root);
         }
     }
+
+    // Abrir la base de datos y mantener una buena gestión output buffers.
     private function get_db()
     {
         $already_required = defined('__ROOT__');
@@ -238,11 +292,12 @@ class PHPUnit_aixada_tests extends TestCase
 
         return $db;
     }
-}
-// Trick to force some config parameters
-function put_config($forced_cfg) {
-    $cfg = configuration_vars::get_instance();
-    foreach ($forced_cfg as $k => $v) {
-        $cfg->$k = $v;
+
+    // Trick to force some config parameters
+    function put_config($forced_cfg) {
+        $cfg = configuration_vars::get_instance();
+        foreach ($forced_cfg as $k => $v) {
+            $cfg->$k = $v;
+        }
     }
 }
