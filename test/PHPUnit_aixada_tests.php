@@ -7,6 +7,23 @@ if (version_compare(PHP_VERSION, '8.0.0') < 0) {
     session_start();
 }
 
+// - Simulamos un GET para el test de envio de correos ja que Aixada usa alguno
+//   de esos datos para indicar a los destinaterios desde que pagina se ha
+//   enviado el mensaje.
+$_SERVER = [
+    'SERVER_PROTOCOL' => 'HTTP/1.1',
+    'SERVER_NAME' => 'localhost',
+    'SERVER_PORT' => '80',
+    'REQUEST_URI' => '/index.php',
+    'REQUEST_METHOD' => 'GET',
+    'SCRIPT_NAME' => '/index.php',
+    'PHP_SELF'    => '/index.php',
+    'HTTP_HOST'   => 'localhost:80',
+    'HTTP_SEC_FETCH_DEST' => 'document',
+    'HTTP_SEC_FETCH_MODE' => 'navigate',
+    'HTTP_SEC_FETCH_SITE' => 'none',
+];
+
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\TestDox;
 
@@ -86,6 +103,54 @@ class PHPUnit_aixada_tests extends TestCase
 
     }
 
+    #[TestDox('Comprovar el envio de correos')]
+    public function test_enviar_un_email(): void
+    {
+        // Como servidor de smtp de pruevas se usa en local: mailpit.axllent.org
+        // See mails at: http://localhost:8025
+        
+        $this->define_root();
+        require_once __ROOT__ . "php/utilities/general.php";
+        put_config([
+            'admin_email' => 'no_es@nesesario.es',
+            'email_SMTP_pswd' => 'no_nesesario',
+            'admin_email' => "test@dummy_origin.com",
+            'email_safe_replyTo' => true,
+            'email_SMTP_host' => 'localhost',
+            'email_SMTP_port' => 1025,
+            'email_SMTP_encryption' => '',
+            'email_SMTP_verifyCert' => false
+        ]);
+        
+        $toEmail = 'some-user@dummy_destination.com'; 
+        $options = [
+            'cc' => 'another-user@dummy_destination.com,yet-another-user@dummy_destination.com',
+            'bcc' => 'and-another-user@dummy_destination.com'
+        ];
+
+        global $Text;
+        $testUTF = 'áàéèïíoóòüúçñ ÁÀÉÈÏÍOÓÒÜÚÇÑ €=EUR';
+        $subject = "IT'S A TEST: ". $testUTF . "<br>";
+        $messageHTML = "<b>Is a test using PHP v." . PHP_VERSION . "</b><br>
+            Test utf-8: " . $testUTF . "<br><br>
+            Options:<br><pre style='margin: 0 0 0 3em'>" . 
+                'toEmail => ' . $toEmail ."\n" .
+                var_export($options, true). 
+            "</pre>
+            Config:<br><pre style='margin: 0 0 0 3em'>" . var_export(array(
+                'coop_name' => get_config('coop_name'),
+                'admin_email' => get_config('admin_email'),
+                'email_SMTP_host' => get_config('email_SMTP_host'),
+                'email_SMTP_pswd' => '(hidden)',
+                'email_SMTP_port' => get_config('email_SMTP_port'),
+                'email_SMTP_encryption' => get_config('email_SMTP_encryption'),
+                'email_SMTP_verifyCert' => get_config('email_SMTP_verifyCert')
+                ), true) . "</pre>";
+
+        $email_was_sent = send_mail($toEmail, $subject, $messageHTML, $options);
+        ob_end_flush();
+        $this->assertEquals(true, $email_was_sent);
+    }
 // =============================================
 
     #[TestDox('Comprobar función DBWrap->get_error() de ./php/inc/database.php')]
@@ -142,19 +207,25 @@ class PHPUnit_aixada_tests extends TestCase
      * Para abrir la base de datos y mantener una buena gestión output buffers.
      * -----------------------
      */
-    private function get_db()
+    private function define_root()
     {
-        $already_required = defined('__ROOT__');
-
-        if(! $already_required) {
+        if(! defined('__ROOT__')) {
             $f_root = dirname(dirname(__FILE__)). '/';
 
             // Los modulos de Aixada usan las constantes DS i __ROOT__
             define('DS', DIRECTORY_SEPARATOR);
             define('__ROOT__', $f_root);
+        }
+    }
+    private function get_db()
+    {
+        $already_required = defined('__ROOT__');
+
+        if(! $already_required) {
+            $this->define_root();
 
             // database.php ya se encarga de hacer los require_once que necesiste
-            require_once $f_root . "php/inc/database.php";
+            require_once __ROOT__ . "php/inc/database.php";
         }
 
         $db = DBWrap::get_instance();
@@ -166,5 +237,12 @@ class PHPUnit_aixada_tests extends TestCase
         }
 
         return $db;
+    }
+}
+// Trick to force some config parameters
+function put_config($forced_cfg) {
+    $cfg = configuration_vars::get_instance();
+    foreach ($forced_cfg as $k => $v) {
+        $cfg->$k = $v;
     }
 }
