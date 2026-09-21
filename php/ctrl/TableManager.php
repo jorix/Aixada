@@ -117,8 +117,15 @@ function post_edit_hook($request)
     case 'aixada_product': 
 	$db = DBWrap::get_instance();
 	$row = $db->Execute("select current_price from aixada_price where product_id=:1", $request['id'])->fetch_array();
-	if ($row[0] != $request['unit_price']) {
-	    $db->Execute("insert into aixada_price (product_id, current_price, operator_id) values (:1, :2, :3);", $request['id'], $request['unit_price'], get_session_user_id());
+    // - Error detectado en php_errors sin poder establecer las circunstancias,.
+    //   -> PHP Warning:  Trying to access array offset on null in \php\ctrl\TableManager.php on line 120
+    // - Se opta por protejer la comparación `$row[0] != $request['unit_price']`
+    //   con valores bien establecidos.
+    $request_price = isset($request['unit_price']) ? $request['unit_price'] : 0;
+    $stored_price  = isset($row[0]) ? $row[0] : 0;
+	if ( $stored_price != $request_price ) {
+	    $db->Execute("insert into aixada_price (product_id, current_price, operator_id) values (:1, :2, :3);",
+	        $request['id'], $request_price, get_session_user_id());
 	}
 	break;
     default:

@@ -168,7 +168,7 @@ class abstract_export_manager {
 			header('Expires: '. date(DATE_RFC822, time() - 3600));
 			$fp = fopen('php://output', 'w');
 			foreach ($this->csv_result as $row) 
-			    fputcsv($fp, $row);
+			    fputcsv($fp, $row, ',', '"', '\\');
 			fclose($fp);
     	}
     	
@@ -233,7 +233,7 @@ class abstract_export_manager {
 	    	
 	    	case "csv":
 	    		foreach ($this->csv_result as $row) {
-	      			fputcsv($outhandle, $row);
+	      			fputcsv($outhandle, $row, ',', '"', '\\');
 		  		}
 		  		break;
 	    	case "xml":
