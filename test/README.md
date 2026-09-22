@@ -1,6 +1,6 @@
 # Pruebas en Aixada
 
-Se usan dos versiones de PHP, 7.4 y 8.5, lo cual garantizar la compatibilidad en  
+Se usan dos versiones de PHP: 7.4 y 8.5, lo cual garantizar la compatibilidad en  
 versiones intermedias.
 
 Se emplean las herramientas [PHPStan](https://phpstan.org/) y
@@ -31,8 +31,10 @@ Se usa [Composer](https://getcomposer.org/download/) tanto para instalar las
 herramientas como para ejecutarlas.
 
 Composer se invoca mediante procedimientos con los sufijos `_t74` y `_t85`
-para determinar qué configuración (`./composer_t74.json` y
-`./composer_t85.json`) se usa en cada versión de PHP.
+que determinan el PHP usado. Cada composer determina que confgración usa:
+`./composer_t74.json` o `./composer_t85.json` via la variable de entorno
+`COMPOSER`.
+
 
 Instalación:
 ```
@@ -59,8 +61,8 @@ Para usar Composer con dos configuraciones distintas en el mismo proyecto, se
 deben crear archivos bash/bat específicos para cada versión y cargar
 configuraciones diferentes en cada uno.
 
-Por ejemplo, en Windows, dentro del directorio de Composer (el del PATH), se
-añade `composer_t74.bat` con:
+Por ejemplo, en Windows, dentro del directorio de Composer se añade 
+`composer_t74.bat` con:
 
 ```bat
 setlocal DISABLEDELAYEDEXPANSION
@@ -69,7 +71,7 @@ set COMPOSER=composer_t74.json
 c:\php74_27_vc15_x64\php "%~dp0composer.phar" %*
 ```
 
-Así se garantiza que use el archivo de configuración `composer_t74.json` y el
-uso de PHP 7.4 (añadiendolo PATH).
+Así se garantiza que use el archivo de configuración `composer_t74.json` y que
+se ejecute con PHP 7.4 (añadiendolo PATH).
 
 Con PHP 8.5 se hace lo mismo.
