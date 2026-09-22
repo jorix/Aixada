@@ -113,6 +113,13 @@ try{
                     $keep_match_field = false;
                     if (isset($template_options['import_mode'])) {
                         switch($template_options['import_mode']) {
+                            case '3': // reset
+                                $append_new = true;
+                                $keep_match_field = true;
+                                if ( get_param('import2Table') == 'aixada_product' ){
+                                    $pi->deactivate_products();
+                                }
+                                break;
                             case '2':
                                 $append_new = true;
                                 $keep_match_field = true;
