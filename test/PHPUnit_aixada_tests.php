@@ -162,9 +162,8 @@ class PHPUnit_aixada_tests extends TestCase
         $this->define_root();
         require_once __ROOT__ . "php/utilities/general.php";
         $this->put_config([
-            'admin_email' => 'no_es@nesesario.es',
-            'email_SMTP_pswd' => 'no_nesesario',
             'admin_email' => "test@dummy_origin.com",
+            'email_SMTP_pswd' => 'no_nesesario',
             'email_safe_replyTo' => true,
             'email_SMTP_host' => 'localhost',
             'email_SMTP_port' => 1025,
